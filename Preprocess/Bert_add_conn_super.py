@@ -33,7 +33,7 @@ df = pd.read_csv('data/pairs.csv')
 # Init csv of result
 with open ('data/pairs_withconn_super.csv', 'w', encoding='utf-8', newline='') as f:
     csv_writer = csv.writer(f)
-    csv_writer.writerow(['section', 'emo_clause_index', 'cau_candidate_index', 'emotion_clause', 'cause_candidate', 'conn', 'correctness', 'is_cause_conn'])
+    csv_writer.writerow(['pair_type', 'section', 'clause_index', 'candidate_index', 'clause', 'candidate', 'conn', 'correctness', 'is_cause_conn'])
 
 # Designate device
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -42,12 +42,13 @@ model = BertForMaskedLM.from_pretrained('bert-base-chinese')
 tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')
 
 for i in range(len(df)):
+    pair_type = df['pair_type'][i]
     section = df['section'][i]
-    emo_clause_index = df['emo_clause_index'][i]
-    cau_candidate_index = df['cau_candidate_index'][i]
-    emotion_clause = df['emotion_clause'][i]
-    cause_candidate = df['cause_candidate'][i]
-    text = '[CLS]' + str(emotion_clause) + '[SEP]' + '[MASK]' + str(cause_candidate) + '[SEP]'
+    clause_index = df['clause_index'][i]
+    candidate_index = df['candidate_index'][i]
+    clause = df['clause'][i]
+    candidate = df['candidate'][i]
+    text = '[CLS]' + str(clause) + '[SEP]' + '[MASK]' + str(candidate) + '[SEP]'
     correctness = df['correctness'][i]
 
     # Tokenize
@@ -56,7 +57,7 @@ for i in range(len(df)):
 
     # Create the tensors of segments
     # Add [CLS]+[SEP], [MASK]+[SEP] respectively
-    segments_ids = [0] * (len(tokenizer.tokenize(emotion_clause)) + 2) + [1] * (len(tokenizer.tokenize(cause_candidate)) + 2)
+    segments_ids = [0] * (len(tokenizer.tokenize(clause)) + 2) + [1] * (len(tokenizer.tokenize(candidate)) + 2)
 
     # Convert tensors to Pytorch tensors
     tokens_tensor = torch.tensor([indexed_tokens]).to(device)
@@ -107,8 +108,8 @@ for i in range(len(df)):
         conn = '因'
         
     else:
-        candidate_index = np.argmax(noncause_conn_score)
-        conn = noncause_uniconn[candidate_index]
+        conn_candidate_index = np.argmax(noncause_conn_score)
+        conn = noncause_uniconn[conn_candidate_index]
 
     if conn in cause_uniconn:
         is_cause_conn = 'true'
@@ -118,4 +119,4 @@ for i in range(len(df)):
     # Write result in csv
     with open ('data/pairs_withconn_super.csv', 'a', encoding='utf-8', newline='') as g:
         csv_writer = csv.writer(g)
-        csv_writer.writerow([section, emo_clause_index, cau_candidate_index, emotion_clause, cause_candidate, conn, correctness, is_cause_conn])
+        csv_writer.writerow([pair_type, section, clause_index, candidate_index, clause, candidate, conn, correctness, is_cause_conn])
