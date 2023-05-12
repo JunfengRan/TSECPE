@@ -1,5 +1,4 @@
 # TSECPE
-Code:<https://disk.pku.edu.cn:443/link/973F7D39F9811EFD8FC52BC84155DC9C>
 Data:<https://disk.pku.edu.cn:443/link/8D9E9E0CE66793B6D478A2070B5D4C1D>
 
 ## Contents
