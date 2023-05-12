@@ -29,7 +29,7 @@ def run_statistics(conn, conn_head_sem_class):
     result[keylist.index(key)].frequency += 1
 
 # Load dataset
-with open ('data/pdtb2.csv', 'r', newline='') as f:
+with open ('../../data/pdtb2.csv', 'r', newline='') as f:
     csv_reader = csv.reader(f,delimiter=',')
     # For each instance (row)
     for row in csv_reader:

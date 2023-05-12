@@ -6,7 +6,7 @@ import csv
 cause_conn = []  # Set cause_conn
 
 # Load connectives info
-with open ('data/cause_conn_modified.txt', 'r', encoding='utf-8') as f:
+with open ('../data/cause_conn_modified.txt', 'r', encoding='utf-8') as f:
     line = f.readline()
     while line:
         for word in line.split(','):
@@ -14,16 +14,16 @@ with open ('data/cause_conn_modified.txt', 'r', encoding='utf-8') as f:
         line = f.readline()
 
 # Init csv for recording result
-with open ('data/pairs.csv', 'w', encoding='utf-8', newline='') as f:
+with open ('../data/pairs.csv', 'w', encoding='utf-8', newline='') as f:
             csv_writer = csv.writer(f)
             csv_writer.writerow(['pair_type', 'section', 'clause_index', 'candidate_index', 'clause', 'candidate', 'correctness'])
 
 # Init csv for recording raw
-with open ('data/discourse.csv', 'w', encoding='utf-8', newline='') as f:
+with open ('../data/discourse.csv', 'w', encoding='utf-8', newline='') as f:
             csv_writer = csv.writer(f)
             csv_writer.writerow(['section', 'discourse', 'word_count', 'doc_len', 'clause_len', 'ec_emotion_pos', 'ec_cause_pos', 'ce_cause_pos', 'ce_emotion_pos', 'ec_true_pairs', 'ce_true_pairs'])
 
-with open ('data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encode by utf-8 for Chinese
+with open ('../data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encode by utf-8 for Chinese
     sec = f.readline()  # Read section ID and length
 
     # For each section
@@ -88,7 +88,7 @@ with open ('data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encode by u
         ec_pairs_index = pairs_index
         ce_pairs_index = [[pair_index[1], pair_index[0]] for pair_index in pairs_index]
         
-        with open ('data/discourse.csv', 'a', encoding='utf-8', newline='') as g:
+        with open ('../data/discourse.csv', 'a', encoding='utf-8', newline='') as g:
             csv_writer = csv.writer(g)
             csv_writer.writerow([section, merged_content, word_count, length, sentence_len, ec_emo_index, ec_cau_index, ce_cau_index, ce_emo_index, ec_pairs_index, ce_pairs_index])
 
@@ -170,7 +170,7 @@ with open ('data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encode by u
                     correctness = 'true'
                     
                 # Write result in csv
-                with open ('data/pairs.csv', 'a', encoding='utf-8', newline='') as g:
+                with open ('../data/pairs.csv', 'a', encoding='utf-8', newline='') as g:
                     csv_writer = csv.writer(g)
                     csv_writer.writerow([pair_type, section, emo_clause_index, cau_candidate_index, emotion_clause, cause_candidate, correctness])
                     
@@ -189,7 +189,7 @@ with open ('data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encode by u
                     correctness = 'true'
                     
                 # Write result in csv
-                with open ('data/pairs.csv', 'a', encoding='utf-8', newline='') as g:
+                with open ('../data/pairs.csv', 'a', encoding='utf-8', newline='') as g:
                     csv_writer = csv.writer(g)
                     csv_writer.writerow([pair_type, section, cau_clause_index, emo_candidate_index, cause_clause, emotion_candidate, correctness])
         

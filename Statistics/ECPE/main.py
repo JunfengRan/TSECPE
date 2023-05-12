@@ -37,14 +37,14 @@ conn_words = []  # Set connectives
 # conn_words_count = []  # Set connectives connt
 
 # Load cause connectives
-with open ('data/cause_uniconn.txt', 'r', encoding='utf-8') as f:
+with open ('../../data/cause_uniconn.txt', 'r', encoding='utf-8') as f:
     line = f.readline()
     while line:
         for word in line.split(','):
             conn_words.append(word)
         line = f.readline()
 
-with open ('data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encode by utf-8 for Chinese
+with open ('../../data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encode by utf-8 for Chinese
     sec = f.readline()  # Read section ID and length
 
     # For each section

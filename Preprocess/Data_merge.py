@@ -2,8 +2,8 @@ import pandas as pd
 import numpy as np
 import csv
 
-df_pairs = pd.read_csv('data/pairs_withconn_super.csv')
-df_discourse = pd.read_csv('data/discourse.csv')
+df_pairs = pd.read_csv('../data/pairs_withconn_super.csv')
+df_discourse = pd.read_csv('../data/discourse.csv')
 connLists = []
 header = 0
 
@@ -24,5 +24,5 @@ for i in range(len(df_discourse)):
     connLists.append(discourse_connLists)
 
 df_discourse['conn'] = connLists
-# df_discourse.to_json('data_out/discourse_withconn.json', orient='records', lines=True, force_ascii=False)
-df_discourse.to_csv('data_out/discourse_withconn_super.csv', index=False)
+# df_discourse.to_json('../data/discourse_withconn.json', orient='records', lines=True, force_ascii=False)
+df_discourse.to_csv('../data/discourse_withconn_super.csv', index=False)

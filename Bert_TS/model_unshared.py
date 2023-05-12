@@ -8,11 +8,6 @@ from gnn_layer import GraphAttentionLayer
 from config import *
 
 
-configs = Config()
-out_emo = nn.Linear(768, 1).to(DEVICE)
-out_cau = nn.Linear(768, 1).to(DEVICE)
-
-
 class Network(nn.Module):
     def __init__(self, configs):
         super(Network, self).__init__()
@@ -141,7 +136,7 @@ class Predictions_ec_emo(nn.Module):
     def __init__(self, configs):
         super(Predictions_ec_emo, self).__init__()
         self.feat_dim = 768
-        self.out_emo = out_emo
+        self.out_emo = nn.Linear(768, 1).to(DEVICE)
 
     def forward(self, doc_sents_h):
         pred_emo = self.out_emo(doc_sents_h).squeeze(-1)  # bs, max_doc_len, 1
@@ -154,7 +149,7 @@ class Predictions_ec_emo_cau(nn.Module):
         super(Predictions_ec_emo_cau, self).__init__()
         self.feat_dim = 768
         self.linear_layer = nn.Linear(3, 1)
-        self.out_cau = out_cau
+        self.out_cau = nn.Linear(768, 1).to(DEVICE)
         self.bert = BertModel.from_pretrained(configs.bert_cache_path)
         self.bert.eval()
         self.bert.to(DEVICE)
@@ -197,7 +192,7 @@ class Predictions_ce_cau(nn.Module):
     def __init__(self, configs):
         super(Predictions_ce_cau, self).__init__()
         self.feat_dim = 768
-        self.out_cau = out_cau
+        self.out_cau = nn.Linear(768, 1).to(DEVICE)
 
     def forward(self, doc_sents_h):
         pred_cau = self.out_cau(doc_sents_h).squeeze(-1)  # bs, max_doc_len, 1
@@ -209,7 +204,7 @@ class Predictions_ce_cau_emo(nn.Module):
         super(Predictions_ce_cau_emo, self).__init__()
         self.feat_dim = 768
         self.linear_layer = nn.Linear(3, 1)
-        self.out_cau = out_cau
+        self.out_cau = nn.Linear(768, 1).to(DEVICE)
         self.bert = BertModel.from_pretrained(configs.bert_cache_path)
         self.bert.eval()
         self.bert.to(DEVICE)

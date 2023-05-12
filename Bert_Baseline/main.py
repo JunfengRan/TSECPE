@@ -11,12 +11,6 @@ import numpy as np
 import pandas as pd
 import pickle
 from utils.utils import *
-from accelerate import Accelerator
-
-
-'''
-batch size = 1 for experiment
-'''
 
 
 # dataset
@@ -24,115 +18,141 @@ class Discourse(Dataset):
     def __init__(self, tokenizer, path):
         self.tokenizer = tokenizer
         self.data_path = path
-        self.discourses_list = []
+        self.section = []
+        self.discourse = []
+        self.word_count = []
+        self.doc_len = []
+        self.clause_len = []
+        self.ec_emotion_pos = []
+        self.ec_cause_pos = []
+        self.ec_true_pairs = []
+        
         df = pd.read_csv(self.data_path)
+        
         for i in range(len(df)):
-            section = int(df['section'][i])
-            discourse = torch.Tensor(self.tokenizer(df['discourse'][i],padding='max_length',max_length=512)['input_ids']).to(torch.int32)
-            word_count = int(df['word_count'][i])
-            doc_len = int(df['doc_len'][i])
-            clause_len = df['clause_len'][i]
-            emotion_pos = df['emotion_pos'][i]
-            cause_pos = df['cause_pos'][i]
-            true_pairs = df['true_pairs'][i]
-            conn = torch.Tensor(self.tokenizer(df['conn'][i],padding='max_length',max_length=512)['input_ids']).to(torch.int32)
-            self.discourses_list.append([section, discourse, word_count, doc_len, clause_len, emotion_pos, cause_pos, true_pairs, conn])
-
-    def __getitem__(self, item):
-        item = self.discourses_list[item]
-        return item
+            self.section.append(int(df['section'][i]))
+            self.discourse.append(torch.Tensor(self.tokenizer(df['discourse'][i],padding='max_length',max_length=512)['input_ids']).to(torch.int32))
+            self.word_count.append(int(df['word_count'][i]))
+            self.doc_len.append(int(df['doc_len'][i]))
+            self.clause_len.append(eval(df['clause_len'][i]))
+            self.ec_emotion_pos.append(eval(df['ec_emotion_pos'][i]))
+            self.ec_cause_pos.append(eval(df['ec_cause_pos'][i]))
+            self.ec_true_pairs.append(eval(df['ec_true_pairs'][i]))
+            
+    def __getitem__(self, index):
+        return self.section[index], self.discourse[index], self.word_count[index], self.doc_len[index], self.clause_len[index], self.ec_emotion_pos[index], self.ec_cause_pos[index], self.ec_true_pairs[index]
 
     def __len__(self):
-        return len(self.discourses_list)
+        return len(self.section)
 
 
 # evaluate one batch
 def evaluate_one_batch(configs, batch, model, tokenizer):
     # 1 doc has 3 emotion clauses and 4 cause clauses at most, respectively
     # 1 emotion clause has 3 corresponding cause clauses at most, 1 cause clause has only 1 corresponding emotion clause
-    with open('data/sentimental_clauses.pkl', 'rb') as f:
+    
+    section, discourse, word_count, doc_len, clause_len, ec_emotion_pos, ec_cause_pos, ec_true_pairs, discourse_mask, segment_mask, query_len, ec_emo_ans, ec_emo_ans_mask, ec_emo_cau_ans, ec_emo_cau_ans_mask, ec_pair_count, discourse_adj = batch
+    
+    # load emo_dictionary
+    with open('../data/sentimental_clauses.pkl', 'rb') as f:
         emo_dictionary = pickle.load(f)
 
-    section, discourse, word_count, doc_len, clause_len, emotion_pos, cause_pos, true_pairs, conn = batch
+    pred_emos = []
+    pred_caus = []
+    pred_pairs = []
+    pred_pairs_pro = []
+    pred_emos_single = []
+    pred_caus_single = []
 
-    emotion_pos = eval(emotion_pos[0])
-    cause_pos = eval(cause_pos[0])
-    true_pairs = eval(true_pairs[0])
-    discourse_mask = torch.Tensor([1] * word_count + [0] * (512 - word_count)).to(torch.int32)
-    segment_mask = torch.Tensor([0] * 512).to(torch.int32)
+    true_emos = []
+    true_caus = []
+    true_pairs = ec_true_pairs
+    for i in range(batch_size):
+        true_emos.append(ec_emotion_pos[i])
+        cause_pos = ec_cause_pos[i]
+        cau_list = []
+        for emo_index in range(len(cause_pos)):
+            for cau in cause_pos[emo_index]:
+                if cau not in cau_list:
+                    cau_list.append(cau)
+        true_caus.append(cau_list)
 
-    query_len = 0
-    discourse_adj = torch.ones([doc_len, doc_len])  # batch size = 1
-    emo_ans = torch.zeros(doc_len)
-    for pos in emotion_pos:
-        emo_ans[int(pos) - 1] = 1
-    emo_ans_mask = torch.ones(doc_len)  # batch size = 1
+    # emotion step
+    emo_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, doc_len, discourse_adj, 'emo')
+    ec_emo_ans_mask = ec_emo_ans_mask.to(DEVICE)
+    temp_emos_prob = []
+    for i in range(batch_size):
+        temp_emos_prob.append(emo_pred.masked_select(ec_emo_ans_mask.bool()).cpu().numpy().tolist())
+    pred_emotion_pos = []
+    for i in range(batch_size):
+        pred_emo = []
+        pred_emo_single = []
+        for idx in range(len(temp_emos_prob[i])):
+            if temp_emos_prob[i][idx] > 0.99 or (temp_emos_prob[i][idx] > 0.5 and idx + 1 in emo_dictionary[str(section[i])]):
+                pred_emo.append(idx)
+                pred_emo_single.append(idx + 1)
 
-    pair_count = len(emotion_pos) * (doc_len - len(emotion_pos) + 1)
+        pred_emo_pos = pred_emo
+        if pred_emo_pos == []:
+            pred_emo_pos = [0]
+        pred_emos.append(pred_emo)
+        pred_emos_single.append(pred_emo_single)
+        pred_emotion_pos.append(pred_emo_pos)
 
-    emo_cau_ans = torch.zeros(len(emotion_pos) * doc_len)
-    for i in range(len(emotion_pos)):
-        for j in range(len(cause_pos[i])):
-            emo_cau_ans[int(doc_len) * i + cause_pos[i][j] - 1] = 1
-    emo_cau_ans_mask = torch.ones(len(emotion_pos) * doc_len)
+    # emotion cause step
+    cau_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, pred_emotion_pos, ec_cause_pos, doc_len, discourse_adj, 'emo_cau')  
+    temp_caus_prob = cau_pred.cpu().numpy().tolist()
+    for i in range(batch_size):
+        pred_cau = []
+        pred_cau_single = []
+        pred_pair = []
+        pred_pair_pro = []
+        for idx_emo in pred_emos[i]:
+            for idx_cau in range(doc_len[i]):
+                if temp_caus_prob[i][pred_emos[i].index(idx_emo) * doc_len[i] + idx_cau] > 0.5 and abs(idx_emo - idx_cau) <= 11:
+                    if idx_cau + 1 not in pred_cau_single:
+                        pred_cau.append(idx_cau)
+                        pred_cau_single.append(idx_cau + 1)
+                    prob_t = temp_emos_prob[i][idx_emo] * temp_caus_prob[i][pred_emos[i].index(idx_emo) * doc_len[i] + idx_cau]
+                    if idx_cau - idx_emo >= 0 and idx_cau - idx_emo <= 2:
+                        pass
+                    else:
+                        prob_t *= 0.9
+                    pred_pair_pro.append(prob_t)
+                    pred_pair.append([idx_emo + 1, idx_cau + 1])
+        
+        pred_caus.append(pred_cau)
+        pred_caus_single.append(pred_cau_single)
+        pred_pairs.append(pred_pair)
+        pred_pairs_pro.append(pred_pair_pro)
 
-    # due to batch = 1, dim0 = 1
-    true_emo = emotion_pos
-    true_cau = []
-    for emo in cause_pos:
-        for cau in emo:
-            true_cau.append(cau)
+    pred_emos_final = []
+    pred_caus_final = []
+    pred_pairs_final = []
 
-    pred_emo_f = []
-    pred_pair_f = []
-    pred_pair_f_pro = []
-    pred_emo_single = []
-    pred_cau_single = []
+    for i in range(batch_size):
+        pred_pair_final = []
+        for idx, pair in enumerate(pred_pairs[i]):
+            if pred_pairs_pro[i][idx] > 0.5:
+                pred_pair_final.append(pair)
+        pred_pairs_final.append(pred_pair_final)
+        
+    for i in range(batch_size):
+        pred_emo_final = []
+        pred_cau_final = []
+        for pair in pred_pair_final:
+            if pair[0] not in pred_emo_final:
+                pred_emo_final.append(pair[0])
+            if pair[1] not in pred_cau_final:
+                pred_cau_final.append(pair[1])
+        pred_emos_final.append(pred_emo_final)
+        pred_caus_final.append(pred_cau_final)
+
+    metric_e, metric_c, metric_p = [0, 0, 0], [0, 0, 0], [0, 0, 0]
     
-    section = str(section.item())
-
-    # step 1
-    f_emo_pred = model(discourse, discourse_mask.unsqueeze(0), segment_mask.unsqueeze(0), query_len, clause_len, emotion_pos, cause_pos, doc_len, discourse_adj, conn, 'emo')
-    emo_ans_mask = emo_ans_mask.to(DEVICE)
-    temp_emo_f_prob = f_emo_pred.masked_select(emo_ans_mask.bool()).cpu().numpy().tolist()
-    for idx in range(len(temp_emo_f_prob)):
-        if temp_emo_f_prob[idx] > 0.99 or (temp_emo_f_prob[idx] > 0.5 and idx + 1 in emo_dictionary[section]):
-            pred_emo_f.append(idx)
-            pred_emo_single.append(idx + 1)
-
-    # step 2
-    for idx_emo in pred_emo_f:
-        f_cau_pred = model(discourse, discourse_mask.unsqueeze(0), segment_mask.unsqueeze(0), query_len, clause_len, emotion_pos, cause_pos, doc_len, discourse_adj, conn, 'emo_cau')  
-        temp_cau_f_prob = f_cau_pred[0].cpu().numpy().tolist()
-
-        for idx_cau in range(len(temp_cau_f_prob)):
-            if temp_cau_f_prob[idx_cau] > 0.5 and abs(idx_emo - idx_cau) <= 11:
-                if idx_cau + 1 not in pred_cau_single:
-                    pred_cau_single.append(idx_cau + 1)
-                prob_t = temp_emo_f_prob[idx_emo] * temp_cau_f_prob[idx_cau]
-                if idx_cau - idx_emo >= 0 and idx_cau - idx_emo <= 2:
-                    pass
-                else:
-                    prob_t *= 0.9
-                pred_pair_f_pro.append(prob_t)
-                pred_pair_f.append([idx_emo + 1, idx_cau + 1])
-
-    pred_emo_final = []
-    pred_cau_final = []
-    pred_pair_final = []
-
-    for i, pair in enumerate(pred_pair_f):
-        if pred_pair_f_pro[i] > 0.5:
-            pred_pair_final.append(pair)
-
-    for pair in pred_pair_final:
-        if pair[0] not in pred_emo_final:
-            pred_emo_final.append(pair[0])
-        if pair[1] not in pred_cau_final:
-            pred_cau_final.append(pair[1])
-
-    metric_e, metric_c, metric_p = \
-        cal_metric(pred_emo_final, true_emo, pred_cau_final, true_cau, pred_pair_final, true_pairs, doc_len)
+    for i in range(batch_size):
+        e, c, p = cal_metric(pred_emos_final[i], true_emos[i], pred_caus_final[i], true_caus[i], pred_pairs_final[i], true_pairs[i], doc_len[i])
+        metric_e, metric_c, metric_p = [item1 + item2 for item1, item2 in zip(metric_e, e)], [item1 + item2 for item1, item2 in zip(metric_c, c)], [item1 + item2 for item1, item2 in zip(metric_p, p)]
     return metric_e, metric_c, metric_p
 
 
@@ -185,35 +205,15 @@ def main(configs, train_loader, test_loader, tokenizer):
             model.train()
             optimizer.zero_grad()
             
-            section, discourse, word_count, doc_len, clause_len, emotion_pos, cause_pos, true_pairs, conn = batch
+            section, discourse, word_count, doc_len, clause_len, ec_emotion_pos, ec_cause_pos, ec_true_pairs, discourse_mask, segment_mask, query_len, ec_emo_ans, ec_emo_ans_mask, ec_emo_cau_ans, ec_emo_cau_ans_mask, ec_pair_count, discourse_adj = batch
 
-            emotion_pos = eval(emotion_pos[0])
-            cause_pos = eval(cause_pos[0])
-            discourse_mask = torch.Tensor([1] * word_count + [0] * (512 - word_count)).to(torch.int32)
-            segment_mask = torch.Tensor([0] * 512).to(torch.int32)
-
-            query_len = 0
-            discourse_adj = torch.ones([doc_len, doc_len])  # batch size = 1
-            emo_ans = torch.zeros(doc_len)
-            for pos in emotion_pos:
-                emo_ans[int(pos) - 1] = 1
-            emo_ans_mask = torch.ones(doc_len)  # batch size = 1
-
-            pair_count = len(emotion_pos) * (doc_len - len(emotion_pos) + 1)
-
-            emo_cau_ans = torch.zeros(len(emotion_pos) * doc_len)
-            for i in range(len(emotion_pos)):
-                for j in range(len(cause_pos[i])):
-                    emo_cau_ans[int(doc_len) * i + cause_pos[i][j] - 1] = 1
-            emo_cau_ans_mask = torch.ones(len(emotion_pos) * doc_len)
-
-            emo_pred = model(discourse, discourse_mask.unsqueeze(0), segment_mask.unsqueeze(0), query_len, clause_len, emotion_pos, cause_pos, doc_len, discourse_adj, conn, 'emo')
-            emo_cau_pred = model(discourse, discourse_mask.unsqueeze(0), segment_mask.unsqueeze(0), query_len, clause_len, emotion_pos, cause_pos, doc_len, discourse_adj, conn, 'emo_cau')
+            ec_emo_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, doc_len, discourse_adj, 'emo')
+            ec_emo_cau_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, doc_len, discourse_adj, 'emo_cau')
             
-            loss_emo = model.loss_pre_emo(emo_pred, emo_ans, emo_ans_mask)
-            loss_emo_cau = model.loss_pre_emo_cau(emo_cau_pred, emo_cau_ans, emo_cau_ans_mask)
+            loss_ec_emo = model.loss_pre_emo(ec_emo_pred, ec_emo_ans, ec_emo_ans_mask)
+            loss_ec_emo_cau = model.loss_pre_emo_cau(ec_emo_cau_pred, ec_emo_cau_ans, ec_emo_cau_ans_mask)
             
-            loss = loss_emo + loss_emo_cau
+            loss = loss_ec_emo + loss_ec_emo_cau
             loss.backward()
 
             if train_step % configs.gradient_accumulation_steps == 0:
@@ -223,7 +223,7 @@ def main(configs, train_loader, test_loader, tokenizer):
 
             if train_step % 1 == 0:
                 print('epoch: {}, step: {}, loss_emo: {}, loss_emo_cau: {}, loss: {}'
-                    .format(epoch, train_step, loss_emo, loss_emo_cau, loss))
+                    .format(epoch, train_step, loss_ec_emo, loss_ec_emo_cau, loss))
         
         with torch.no_grad():
             eval_emo, eval_cau, eval_pair = evaluate(configs, test_loader, model, tokenizer)
@@ -235,7 +235,7 @@ def main(configs, train_loader, test_loader, tokenizer):
                 max_result_pair = eval_pair
     
                 state_dict = {'model': model.state_dict(), 'result': max_result_pair}
-                # torch.save(state_dict, 'model/model.pth')
+                torch.save(state_dict, 'model/model.pth')
             else:
                 early_stop_flag += 1
         if epoch > configs.epochs / 2 and early_stop_flag >= 7:
@@ -244,16 +244,89 @@ def main(configs, train_loader, test_loader, tokenizer):
     return max_result_emo, max_result_cau, max_result_pair
 
 
+def my_collate_fn(batch):
+    configs = Config()
+    batch_size = configs.batch_size
+    
+    batch = zip(*batch)
+    section, discourse, word_count, doc_len, clause_len, ec_emotion_pos, ec_cause_pos, ec_true_pairs = batch
+
+    # save for possible query
+    query_len = (0,) * batch_size
+    
+    max_doc_len = max(doc_len)
+    
+    # mask for real words
+    discourse_mask = torch.zeros(batch_size, 512)
+    for i in range(batch_size):
+        discourse_mask[i,:] =  torch.Tensor([1] * word_count[i] + [0] * (512 - word_count[i])).to(torch.int32)
+    
+    # mask for segment
+    segment_mask = torch.zeros(batch_size, 512)
+    for i in range(batch_size):
+        segment_mask[i,:] =  torch.Tensor([0] * query_len[i] + [1] * (512 - query_len[i])).to(torch.int32)
+    
+    # mask for real clauses
+    discourse_adj = torch.zeros(batch_size, max_doc_len, max_doc_len)
+    for i in range(batch_size):
+        discourse_adj[i, :doc_len[i], :doc_len[i]] =  1
+
+    # emotion cause
+    # 1 doc has 3 emotion clauses and 4 cause clauses at most, respectively
+    # 1 emotion clause has 3 corresponding cause clauses at most, 1 cause clause has only 1 corresponding emotion clause
+    
+    # emotion answer and mask
+    ec_emo_ans = []
+    ec_emo_ans_mask = []
+    for i in range(batch_size):
+        ec_emo_ans.append(torch.zeros(max_doc_len))
+        ec_emo_ans_mask.append(torch.zeros(max_doc_len))
+        ec_emo_ans_mask[i][:doc_len[i]] = 1
+        for pos in ec_emotion_pos[i]:
+            ec_emo_ans[i][pos - 1] = 1
+
+    # count ec_pairs
+    ec_pair_count = []
+    for i in range(batch_size):
+        ec_pair_count.append(len(ec_emotion_pos[i]) * doc_len[i])
+
+    # emotion cause answer and mask
+    ec_emo_cau_ans = []
+    ec_emo_cau_ans_mask = []
+    for i in range(batch_size):
+        ec_emo_cau_ans.append(torch.zeros(3 * max_doc_len))
+        ec_emo_cau_ans_mask.append(torch.zeros(3 * max_doc_len))
+        ec_emo_cau_ans_mask[i][:len(ec_emotion_pos[i]) * doc_len[i]] = 1
+        for emo_index in range(len(ec_cause_pos[i])):
+            for pos in ec_cause_pos[i][emo_index]:
+                ec_emo_cau_ans[i][doc_len[i] * emo_index + pos - 1] = 1
+
+    discourse = torch.tensor([item.tolist() for item in discourse]).to(torch.int32)
+    discourse_mask = torch.tensor([item.tolist() for item in discourse_mask]).to(torch.int32)
+    segment_mask = torch.tensor([item.tolist() for item in segment_mask]).to(torch.int32)
+    ec_emo_ans = torch.tensor([item.tolist() for item in ec_emo_ans]).to(torch.int32)
+    ec_emo_ans_mask = torch.tensor([item.tolist() for item in ec_emo_ans_mask]).to(torch.int32)
+    ec_emo_cau_ans = torch.tensor([item.tolist() for item in ec_emo_cau_ans]).to(torch.int32)
+    ec_emo_cau_ans_mask = torch.tensor([item.tolist() for item in ec_emo_cau_ans_mask]).to(torch.int32)
+    discourse_adj = torch.tensor([item.tolist() for item in discourse_adj])
+
+    return section, discourse, word_count, doc_len, clause_len, ec_emotion_pos, ec_cause_pos, ec_true_pairs, discourse_mask, segment_mask, query_len, ec_emo_ans, ec_emo_ans_mask, ec_emo_cau_ans, ec_emo_cau_ans_mask, ec_pair_count, discourse_adj
+
 if __name__ == '__main__':
     configs = Config()
     device = DEVICE
+    
+    global batch_size
+    batch_size = configs.batch_size
+    
     tokenizer = BertTokenizer.from_pretrained(configs.bert_cache_path)
     model = Network(configs).to(DEVICE)
     
     train_dataset = Discourse(tokenizer, configs.train_dataset_path)
-    train_loader = DataLoader(dataset=train_dataset, shuffle=False, batch_size=1,drop_last=True)
+    train_loader = DataLoader(dataset=train_dataset, shuffle=False, batch_size=configs.batch_size, collate_fn=my_collate_fn, drop_last=True)
+    
     test_dataset = Discourse(tokenizer, configs.test_dataset_path)
-    test_loader = DataLoader(dataset=test_dataset, shuffle=False, batch_size=1)
+    test_loader = DataLoader(dataset=test_dataset, shuffle=False, batch_size=configs.batch_size, collate_fn=my_collate_fn, drop_last=True)
     
     max_result_emo, max_result_cau, max_result_pair = main(configs, train_loader, test_loader, tokenizer)
     print('max_result_emo: {}, max_result_cau: {}, max_result_pair: {}'.format(max_result_emo, max_result_cau, max_result_pair))

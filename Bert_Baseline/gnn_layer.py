@@ -46,7 +46,7 @@ class GraphAttentionLayer(nn.Module):
         attn = attn_src.expand(-1, -1, -1, N) + attn_dst.expand(-1, -1, -1, N).permute(0, 1, 3, 2)
         attn = F.leaky_relu(attn, self.leaky_alpha, inplace=True)
 
-        adj = torch.FloatTensor(adj).unsqueeze(0).to(DEVICE)
+        adj = torch.FloatTensor(adj).to(DEVICE)
         mask = 1 - adj.unsqueeze(1)
         attn.data.masked_fill_(mask.bool(), -999)
 

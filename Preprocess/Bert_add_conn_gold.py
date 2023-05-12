@@ -8,19 +8,19 @@ from transformers import BertTokenizer, BertForMaskedLM
 cause_uniconn = []
 noncause_uniconn = []
 candidate_conn = []
-with open ('data/cause_uniconn_modified.txt', 'r', encoding='utf-8') as f:
+with open ('../data/cause_uniconn_modified.txt', 'r', encoding='utf-8') as f:
     line = f.readline()
     while line:
         for word in line.split(','):
             cause_uniconn.append(word)
         line = f.readline()
-with open ('data/noncause_uniconn.txt', 'r', encoding='utf-8') as f:
+with open ('../data/noncause_uniconn.txt', 'r', encoding='utf-8') as f:
     line = f.readline()
     while line:
         for word in line.split(','):
             noncause_uniconn.append(word)
         line = f.readline()
-with open ('data/uniconn_modified.txt', 'r', encoding='utf-8') as f:
+with open ('../data/uniconn_modified.txt', 'r', encoding='utf-8') as f:
     line = f.readline()
     while line:
         for word in line.split(','):
@@ -28,10 +28,10 @@ with open ('data/uniconn_modified.txt', 'r', encoding='utf-8') as f:
         line = f.readline()
 
 # Load dataset
-df = pd.read_csv('data/pairs.csv')
+df = pd.read_csv('../data/pairs.csv')
 
 # Init csv of result
-with open ('data/pairs_withconn_gold.csv', 'w', encoding='utf-8', newline='') as f:
+with open ('../data/pairs_withconn_gold.csv', 'w', encoding='utf-8', newline='') as f:
     csv_writer = csv.writer(f)
     csv_writer.writerow(['section', 'emo_clause_index', 'cau_candidate_index', 'emotion_clause', 'cause_candidate', 'conn', 'correctness', 'is_cause_conn'])
 
@@ -117,6 +117,6 @@ for i in range(len(df)):
         is_cause_conn = 'false'
 
     # Write result in csv
-    with open ('data/pairs_withconn_gold.csv', 'a', encoding='utf-8', newline='') as g:
+    with open ('../data/pairs_withconn_gold.csv', 'a', encoding='utf-8', newline='') as g:
         csv_writer = csv.writer(g)
         csv_writer.writerow([section, emo_clause_index, cau_candidate_index, emotion_clause, cause_candidate, conn, correctness, is_cause_conn])
