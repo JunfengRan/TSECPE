@@ -294,8 +294,8 @@ def my_collate_fn(batch):
     ec_emo_cau_ans = []
     ec_emo_cau_ans_mask = []
     for i in range(batch_size):
-        ec_emo_cau_ans.append(torch.zeros(3 * max_doc_len))
-        ec_emo_cau_ans_mask.append(torch.zeros(3 * max_doc_len))
+        ec_emo_cau_ans.append(torch.zeros(8 * max_doc_len))
+        ec_emo_cau_ans_mask.append(torch.zeros(8 * max_doc_len))
         ec_emo_cau_ans_mask[i][:len(ec_emotion_pos[i]) * doc_len[i]] = 1
         for emo_index in range(len(ec_cause_pos[i])):
             for pos in ec_cause_pos[i][emo_index]:
@@ -323,10 +323,10 @@ if __name__ == '__main__':
     model = Network(configs).to(DEVICE)
     
     train_dataset = Discourse(tokenizer, configs.train_dataset_path)
-    train_loader = DataLoader(dataset=train_dataset, shuffle=False, batch_size=configs.batch_size, collate_fn=my_collate_fn, drop_last=True)
+    train_loader = DataLoader(dataset=train_dataset, shuffle=True, batch_size=configs.batch_size, collate_fn=my_collate_fn, drop_last=True)
     
     test_dataset = Discourse(tokenizer, configs.test_dataset_path)
-    test_loader = DataLoader(dataset=test_dataset, shuffle=False, batch_size=configs.batch_size, collate_fn=my_collate_fn, drop_last=True)
+    test_loader = DataLoader(dataset=test_dataset, shuffle=True, batch_size=configs.batch_size, collate_fn=my_collate_fn, drop_last=True)
     
     max_result_emo, max_result_cau, max_result_pair = main(configs, train_loader, test_loader, tokenizer)
     print('max_result_emo: {}, max_result_cau: {}, max_result_pair: {}'.format(max_result_emo, max_result_cau, max_result_pair))

@@ -133,10 +133,14 @@ class Network(nn.Module):
                 clause_start.append(clause_start[j] + clause_len[i][j])
             for j in range(len(emotion_pos[i])):
                 for k in range(doc_len[i]):
-                    arg1 = discourse[i][clause_start[emotion_pos[i][j] - 1]:clause_start[emotion_pos[i][j]]]
-                    arg2 = discourse[i][clause_start[k]:clause_start[k + 1]]
-                    len1 = clause_len[i][emotion_pos[i][j] - 1]
-                    len2 = clause_len[i][k]
+                    arg1_start = min([clause_start[min([emotion_pos[i][j] - 1, doc_len[i]])], len(discourse[i]) - 1])
+                    arg1_end = min([clause_start[min([emotion_pos[i][j], doc_len[i]])], len(discourse[i]) - 1])
+                    arg2_start = min([clause_start[k], len(discourse[i]) - 1])
+                    arg2_end = min([clause_start[k + 1], len(discourse[i]) - 1])
+                    arg1 = discourse[i][arg1_start: arg1_end]
+                    arg2 = discourse[i][arg2_start: arg2_end]
+                    len1 = len(arg1)
+                    len2 = len(arg2)
                     sep_token = torch.tensor([102])
                     mask_token = torch.tensor([103])
                     inputs = torch.cat([arg1, sep_token, mask_token, arg2])
@@ -158,19 +162,19 @@ class Network(nn.Module):
                     else:
                         pairs_h = torch.vstack([pairs_h, pair_h])  # shape: clause_len * emotion_num, feat_dim * 3
             
-            # Pad pairs_h to 3 * max_doc_len
-            while pairs_h.size(0) < 3 * max_doc_len:
-                pairs_h = torch.vstack([pairs_h, torch.zeros(([3 * self.feat_dim])).to(DEVICE)])  # shape: 3 * max_doc_len, feat_dim * 3
+            # Pad pairs_h to 8 * max_doc_len
+            while pairs_h.size(0) < 8 * max_doc_len:
+                pairs_h = torch.vstack([pairs_h, torch.zeros(([3 * self.feat_dim])).to(DEVICE)])  # shape: 8 * max_doc_len, feat_dim * 3
             
         # Concatenate pairs for whole batch answer
             if pairs_hs.shape[-1] == 0:
                 pairs_hs = pairs_h
             else:
-                pairs_hs = torch.stack([pairs_hs, pairs_h], dim=0)  # shape: batch_size, 3 * max_doc_len, 3 * feat_dim
+                pairs_hs = torch.stack([pairs_hs, pairs_h], dim=0)  # shape: batch_size, 8 * max_doc_len, 3 * feat_dim
 
-        pred_emo_cau = self.out_emo_cau(pairs_hs).squeeze(-1)  # shape: batch_size, 3 * max_doc_len
+        pred_emo_cau = self.out_emo_cau(pairs_hs).squeeze(-1)  # shape: batch_size, 8 * max_doc_len
         pred_emo_cau = torch.sigmoid(pred_emo_cau)
-        return pred_emo_cau # shape: batch_size, 3 * max_doc_len
+        return pred_emo_cau # shape: batch_size, 8 * max_doc_len
 
     def loss_pre_emo(self, pred, true, mask):
         true = torch.FloatTensor(true.float()).to(DEVICE)  # shape: batch_size, seq_len
