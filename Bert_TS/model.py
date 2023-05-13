@@ -7,6 +7,29 @@ from config import DEVICE
 from gnn_layer import GraphAttentionLayer
 
 
+# Init param
+cause_uniconn = []
+noncause_uniconn = []
+candidate_conn = []
+with open ('../data/cause_uniconn_modified.txt', 'r', encoding='utf-8') as f:
+    line = f.readline()
+    while line:
+        for word in line.split(','):
+            cause_uniconn.append(word)
+        line = f.readline()
+with open ('../data/noncause_uniconn.txt', 'r', encoding='utf-8') as f:
+    line = f.readline()
+    while line:
+        for word in line.split(','):
+            noncause_uniconn.append(word)
+        line = f.readline()
+with open ('../data/uniconn_modified.txt', 'r', encoding='utf-8') as f:
+    line = f.readline()
+    while line:
+        for word in line.split(','):
+            candidate_conn.append(word)
+        line = f.readline()
+
 class Network(nn.Module):
     def __init__(self, configs):
         super(Network, self).__init__()
@@ -37,21 +60,32 @@ class Network(nn.Module):
         # pred_emo
         self.out_emo = nn.Linear(self.feat_dim, 1)
         
-        # pred_emo_cau
-        self.out_emo_cau = nn.Linear(self.feat_dim * 3, 1)
+        # pred_cau
+        self.out_cau = nn.Linear(self.feat_dim, 1)
+        
+        # pred_pair
+        self.out_pair = nn.Linear(self.feat_dim * 3, 1)
+        
+        # bert_eval
         self.bert_eval.eval()
         self.bert_eval
     
-    def forward(self, query, query_mask, query_seg, query_len, clause_len, emotion_pos, cause_pos, doc_len, adj, q_type):
+    def forward(self, query, query_mask, query_seg, query_len, clause_len, ec_emotion_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, doc_len, adj, q_type):
         # shape: batch_size, max_doc_len, 512
         doc_sents_h = self.bert_encoder(query, query_mask, query_seg, query_len, clause_len, doc_len)
         doc_sents_h = self.graph_gnn(doc_sents_h, doc_len, adj)
         pred_emo = self.pred_emo(doc_sents_h)
-        pred_emo_cau = self.pred_emo_cau(doc_sents_h, query, emotion_pos, doc_len, clause_len)
+        pred_emo_cau = self.pred_emo_cau(doc_sents_h, query, ec_emotion_pos, doc_len, clause_len)
+        pred_cau = self.pred_cau(doc_sents_h)
+        pred_cau_emo = self.pred_cau_emo(doc_sents_h, query, ce_cause_pos, doc_len, clause_len)
         if q_type == 'emo':
             return pred_emo
         if q_type == 'emo_cau':
             return pred_emo_cau
+        if q_type == 'cau':
+            return pred_cau
+        if q_type == 'cau_emo':
+            return pred_cau_emo
         
         return None
 
@@ -120,6 +154,11 @@ class Network(nn.Module):
         pred_emo = torch.sigmoid(pred_emo)
         return pred_emo # shape: batch_size, max_doc_len
 
+    def pred_cau(self, doc_sents_h):
+        pred_cau = self.out_cau(doc_sents_h).squeeze(-1)  # shape: batch_size, max_doc_len, 1
+        pred_cau = torch.sigmoid(pred_cau)
+        return pred_cau # shape: batch_size, max_doc_len
+
     def pred_emo_cau(self, doc_sents_h, discourse, emotion_pos, doc_len, clause_len):
         # For each item in batch
         # shape: batch_size, max_doc_len, feat_dim
@@ -171,9 +210,66 @@ class Network(nn.Module):
             else:
                 pairs_hs = torch.stack([pairs_hs, pairs_h], dim=0)  # shape: batch_size, 8 * max_doc_len, 3 * feat_dim
 
-        pred_emo_cau = self.out_emo_cau(pairs_hs).squeeze(-1)  # shape: batch_size, 8 * max_doc_len
-        pred_emo_cau = torch.sigmoid(pred_emo_cau)
+        pred_cau = self.out_cau(pairs_hs[:, :, 2 * self.feat_dim:]).squeeze(-1)  # shape: batch_size, 8 * max_doc_len
+        pred_emo_cau = self.out_pair(pairs_hs).squeeze(-1)  # shape: batch_size, 8 * max_doc_len
+        pred_emo_cau = torch.sigmoid(pred_cau + pred_emo_cau)
         return pred_emo_cau # shape: batch_size, 8 * max_doc_len
+
+    def pred_cau_emo(self, doc_sents_h, discourse, cause_pos, doc_len, clause_len):
+        # For each item in batch
+        # shape: batch_size, max_doc_len, feat_dim
+        pairs_hs = torch.tensor([]).to(DEVICE)
+        max_doc_len = max(doc_len)
+        for i in range(doc_sents_h.size(0)):
+            # Init pairs_h
+            pairs_h = torch.tensor([]).to(DEVICE)
+            clause_start = [0]
+            for j in range(len(clause_len[i])):
+                clause_start.append(clause_start[j] + clause_len[i][j])
+            for j in range(len(cause_pos[i])):
+                for k in range(doc_len[i]):
+                    arg1_start = clause_start[cause_pos[i][j] - 1]
+                    arg1_end = clause_start[cause_pos[i][j]]
+                    arg2_start = clause_start[k]
+                    arg2_end = clause_start[k + 1]
+                    arg1 = discourse[i][arg1_start: arg1_end]
+                    arg2 = discourse[i][arg2_start: arg2_end]
+                    len1 = len(arg1)
+                    len2 = len(arg2)
+                    sep_token = torch.tensor([102])
+                    mask_token = torch.tensor([103])
+                    inputs = torch.cat([arg1, sep_token, mask_token, arg2])
+                    inputs = F.pad(inputs, (0, 512 - inputs.size(-1)), 'constant', 0).unsqueeze(0)
+                    mask = torch.tensor([1] * (len1 + 2 + len2)+ [0] * (510 - len1 - len2)).unsqueeze(0)
+                    segement = torch.tensor([0] * (len1 + 1) + [1] * (511 - len1)).unsqueeze(0)
+            
+                    # Get connective embedding
+                    with torch.no_grad():
+                        conn_embedding = self.bert_eval(inputs.to(DEVICE), mask.to(DEVICE), segement.to(DEVICE))[0][0][len1 + 1]
+                    
+                    # Stack three embeddings for one pair presentation
+                    pair_h = torch.cat([doc_sents_h[i][k], conn_embedding, doc_sents_h[i][cause_pos[i][j] - 1]], dim=-1)  # shape: 3 * feat_dim
+                    
+                    # Concatenate pairs for whole doc answer
+                    if pairs_h.size(-1) == 0:
+                        pairs_h = pair_h
+                    else:
+                        pairs_h = torch.vstack([pairs_h, pair_h])  # shape: doc_len * cause_num, feat_dim * 3
+            
+            # Pad pairs_h to 8 * max_doc_len
+            while pairs_h.size(0) < 8 * max_doc_len:
+                pairs_h = torch.vstack([pairs_h, torch.zeros(([3 * self.feat_dim])).to(DEVICE)])  # shape: 8 * max_doc_len, feat_dim * 3
+            
+            # Concatenate pairs for whole batch answer
+            if pairs_hs.size(-1) == 0:
+                pairs_hs = pairs_h
+            else:
+                pairs_hs = torch.stack([pairs_hs, pairs_h], dim=0)  # shape: batch_size, 8 * max_doc_len, 3 * feat_dim
+
+        pred_emo = self.out_emo(pairs_hs[:, :, :self.feat_dim]).squeeze(-1)  # shape: batch_size, 8 * max_doc_len
+        pred_cau_emo = self.out_pair(pairs_hs).squeeze(-1)  # shape: batch_size, 8 * max_doc_len
+        pred_cau_emo = torch.sigmoid(pred_emo + pred_cau_emo)
+        return pred_cau_emo # shape: batch_size, 8 * max_doc_len
 
     def loss_pre(self, pred, true, mask):
         true = torch.FloatTensor(true.float()).to(DEVICE)  # shape: batch_size, seq_len

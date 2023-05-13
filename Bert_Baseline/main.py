@@ -50,8 +50,12 @@ class Discourse(Dataset):
 def evaluate_one_batch(configs, batch, model, tokenizer):
     # 1 doc has 3 emotion clauses and 4 cause clauses at most, respectively
     # 1 emotion clause has 3 corresponding cause clauses at most, 1 cause clause has only 1 corresponding emotion clause
+    # set emotion slot to 8 for padding
     
     section, discourse, word_count, doc_len, clause_len, ec_emotion_pos, ec_cause_pos, ec_true_pairs, discourse_mask, segment_mask, query_len, ec_emo_ans, ec_emo_ans_mask, ec_emo_cau_ans, ec_emo_cau_ans_mask, ec_pair_count, discourse_adj = batch
+    
+    # change batch_size to len(section) for unification
+    batch_size = len(section)
     
     # load emo_dictionary
     with open('../data/sentimental_clauses.pkl', 'rb') as f:
@@ -82,7 +86,7 @@ def evaluate_one_batch(configs, batch, model, tokenizer):
     ec_emo_ans_mask = ec_emo_ans_mask.to(DEVICE)
     temp_emos_prob = []
     for i in range(batch_size):
-        temp_emos_prob.append(emo_pred.masked_select(ec_emo_ans_mask.bool()).cpu().numpy().tolist())
+        temp_emos_prob.append(emo_pred[i].masked_select(ec_emo_ans_mask[i].bool()).cpu().numpy().tolist())
     pred_emotion_pos = []
     for i in range(batch_size):
         pred_emo = []
@@ -92,9 +96,9 @@ def evaluate_one_batch(configs, batch, model, tokenizer):
                 pred_emo.append(idx)
                 pred_emo_single.append(idx + 1)
 
-        pred_emo_pos = pred_emo
+        pred_emo_pos = pred_emo_single
         if pred_emo_pos == []:
-            pred_emo_pos = [0]
+            pred_emo_pos = [1]
         pred_emos.append(pred_emo)
         pred_emos_single.append(pred_emo_single)
         pred_emotion_pos.append(pred_emo_pos)
@@ -140,7 +144,7 @@ def evaluate_one_batch(configs, batch, model, tokenizer):
     for i in range(batch_size):
         pred_emo_final = []
         pred_cau_final = []
-        for pair in pred_pair_final:
+        for pair in pred_pairs_final[i]:
             if pair[0] not in pred_emo_final:
                 pred_emo_final.append(pair[0])
             if pair[1] not in pred_cau_final:
@@ -180,6 +184,7 @@ def main(configs, train_loader, test_loader, tokenizer):
 
     # model
     model = Network(configs).to(DEVICE)
+    
     # optimizer
     params = list(model.named_parameters())
     optimizer_grouped_params = [
@@ -210,8 +215,8 @@ def main(configs, train_loader, test_loader, tokenizer):
             ec_emo_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, doc_len, discourse_adj, 'emo')
             ec_emo_cau_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, doc_len, discourse_adj, 'emo_cau')
             
-            loss_ec_emo = model.loss_pre_emo(ec_emo_pred, ec_emo_ans, ec_emo_ans_mask)
-            loss_ec_emo_cau = model.loss_pre_emo_cau(ec_emo_cau_pred, ec_emo_cau_ans, ec_emo_cau_ans_mask)
+            loss_ec_emo = model.loss_pre(ec_emo_pred, ec_emo_ans, ec_emo_ans_mask)
+            loss_ec_emo_cau = model.loss_pre(ec_emo_cau_pred, ec_emo_cau_ans, ec_emo_cau_ans_mask)
             
             loss = loss_ec_emo + loss_ec_emo_cau
             loss.backward()
@@ -246,10 +251,13 @@ def main(configs, train_loader, test_loader, tokenizer):
 
 def my_collate_fn(batch):
     configs = Config()
-    batch_size = configs.batch_size
     
+    # unzip batch
     batch = zip(*batch)
     section, discourse, word_count, doc_len, clause_len, ec_emotion_pos, ec_cause_pos, ec_true_pairs = batch
+    
+    # change batch_size to len(section) for unification
+    batch_size = len(section)
 
     # save for possible query
     query_len = (0,) * batch_size
@@ -274,6 +282,7 @@ def my_collate_fn(batch):
     # emotion cause
     # 1 doc has 3 emotion clauses and 4 cause clauses at most, respectively
     # 1 emotion clause has 3 corresponding cause clauses at most, 1 cause clause has only 1 corresponding emotion clause
+    # set emotion slot to 8 for padding
     
     # emotion answer and mask
     ec_emo_ans = []
@@ -291,6 +300,7 @@ def my_collate_fn(batch):
         ec_pair_count.append(len(ec_emotion_pos[i]) * doc_len[i])
 
     # emotion cause answer and mask
+    # note: ec_emo_cau_ans and ans_mask change during evaluate and need another initialization
     ec_emo_cau_ans = []
     ec_emo_cau_ans_mask = []
     for i in range(batch_size):
@@ -312,12 +322,10 @@ def my_collate_fn(batch):
 
     return section, discourse, word_count, doc_len, clause_len, ec_emotion_pos, ec_cause_pos, ec_true_pairs, discourse_mask, segment_mask, query_len, ec_emo_ans, ec_emo_ans_mask, ec_emo_cau_ans, ec_emo_cau_ans_mask, ec_pair_count, discourse_adj
 
+
 if __name__ == '__main__':
     configs = Config()
     device = DEVICE
-    
-    global batch_size
-    batch_size = configs.batch_size
     
     tokenizer = BertTokenizer.from_pretrained(configs.bert_cache_path)
     model = Network(configs).to(DEVICE)
