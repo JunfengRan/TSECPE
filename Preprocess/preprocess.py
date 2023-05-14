@@ -1,6 +1,10 @@
 import csv
+import torch
+import numpy as np
+from transformers import BertTokenizer
 
-# Set pairs
+# Tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')
 
 # Init param
 cause_conn = []  # Set cause_conn
@@ -46,6 +50,8 @@ with open ('../data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encode b
             pairs_index.append(list(map(int, pair.lstrip('(').rstrip(')').split(','))))
 
         # Get the content of section
+        # save for cls
+        # sum_len = 1
         sum_len = 0
         word_count = 0
         sentence_len = []
@@ -56,9 +62,13 @@ with open ('../data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encode b
             for word in content[i].split(' '):
                 refined_content[i] += word
         
-            sum_len += 2 + len(refined_content[i])
-            word_count += len(refined_content[i])
-            sentence_len.append(len(refined_content[i]))
+            content_len = len(tokenizer.tokenize(refined_content[i]))
+            
+            # save for sep
+            # sum_len += content_len + 2
+            sum_len += content_len
+            word_count += content_len
+            sentence_len.append(content_len)
         
         # Set Bert_trunk (pass)
         if sum_len > 512:

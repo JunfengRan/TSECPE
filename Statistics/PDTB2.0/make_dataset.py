@@ -12,14 +12,13 @@ def transform_sem_class(sem_class):
 # Init csv
 with open ('../../data/dataset.csv', 'w', encoding='utf-8', newline='') as f:
     csv_writer = csv.writer(f)
-    csv_writer.writerow(['relation', 'section', 'filenumber', 'Arg1_RawText', 'Arg2_RawText, conn', 'conn_head_sem_class'])
+    csv_writer.writerow(['relation', 'section', 'filenumber', 'Arg1_RawText', 'Arg2_RawText', 'conn', 'conn_head_sem_class'])
 
 # Write result in csv
-def write_pair(self, relation, section, filenumber, Arg1_RawText, Arg2_RawText, conn, conn_head_sem_class):
+def write_pair(relation, section, filenumber, Arg1_RawText, Arg2_RawText, conn, conn_head_sem_class):
     with open ('../../data/dataset.csv', 'a', encoding='utf-8', newline='') as f:
         csv_writer = csv.writer(f)
-        for item in result:
-            csv_writer.writerow([relation, section, filenumber, Arg1_RawText, Arg2_RawText, conn, conn_head_sem_class])
+        csv_writer.writerow([relation, section, filenumber, Arg1_RawText, Arg2_RawText, conn, conn_head_sem_class])
 
 # Load dataset
 with open ('../../data/pdtb2.csv', 'r', newline='') as f:
