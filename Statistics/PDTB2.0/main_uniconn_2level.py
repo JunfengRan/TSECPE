@@ -1,5 +1,8 @@
 import numpy as np
 import csv
+from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
 # Define class
 class Statistics():
@@ -49,7 +52,7 @@ with open ('../../data/pdtb2.csv', 'r', newline='') as f:
             for index in range(12,14):
                 if row[index] != '':
                     conn_head_sem_class = transform_sem_class(row[index])
-                    if ' ' not in conn:
+                    if len(tokenizer.tokenize(conn)) == 1:
                         run_statistics(conn, conn_head_sem_class)
         # Conn1
         if row[10] != '':
@@ -57,7 +60,7 @@ with open ('../../data/pdtb2.csv', 'r', newline='') as f:
             for index in range(12,14):
                 if row[index] != '':
                     conn_head_sem_class = transform_sem_class(row[index])
-                    if ' ' not in conn:
+                    if len(tokenizer.tokenize(conn)) == 1:
                         run_statistics(conn, conn_head_sem_class)
         # Conn2
         if row[11] != '':
@@ -65,11 +68,11 @@ with open ('../../data/pdtb2.csv', 'r', newline='') as f:
             for index in range(14,16):
                 if row[index] != '':
                     conn_head_sem_class = transform_sem_class(row[index])
-                    if ' ' not in conn:
+                    if len(tokenizer.tokenize(conn)) == 1:
                         run_statistics(conn, conn_head_sem_class)
 
 # Write result in csv
-with open ('result/result_uniconn.csv', 'w', encoding='utf-8', newline='') as f:
+with open ('result/result_uniconn.csv', 'w', newline='') as f:
     csv_writer = csv.writer(f)
 
     csv_writer.writerow(['key', 'conn', 'conn_head_sem_class', 'frequency', 'conn_total_count'])

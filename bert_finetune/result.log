@@ -1,0 +1,28 @@
+nohup: ignoring input
+Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertForMaskedLM: ['cls.seq_relationship.bias', 'cls.seq_relationship.weight']
+- This IS expected if you are initializing BertForMaskedLM from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForMaskedLM from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Token indices sequence length is longer than the specified maximum sequence length for this model (559 > 512). Running this sequence through the model will result in indexing errors
+epoch: 0, train_loss: 50225.09375, test_loss: 4595.6015625
+epoch: 1, train_loss: 45649.1484375, test_loss: 4545.33203125
+epoch: 2, train_loss: 43067.9296875, test_loss: 4214.7939453125
+epoch: 3, train_loss: 42076.37109375, test_loss: 4204.38623046875
+epoch: 4, train_loss: 41473.46484375, test_loss: 4578.494140625
+epoch: 5, train_loss: 41073.66015625, test_loss: 4244.31689453125
+epoch: 6, train_loss: 38800.234375, test_loss: 4250.734375
+epoch: 7, train_loss: 38596.328125, test_loss: 4355.4423828125
+epoch: 8, train_loss: 37875.41796875, test_loss: 4373.60546875
+epoch: 9, train_loss: 37174.2109375, test_loss: 4217.783203125
+epoch: 10, train_loss: 36508.64453125, test_loss: 4262.2353515625
+epoch: 11, train_loss: 35803.56640625, test_loss: 4418.16796875
+epoch: 12, train_loss: 35292.70703125, test_loss: 4184.85693359375
+epoch: 13, train_loss: 35221.46875, test_loss: 4298.97900390625
+epoch: 14, train_loss: 34431.33984375, test_loss: 4110.03759765625
+epoch: 15, train_loss: 34175.5625, test_loss: 4152.65673828125
+epoch: 16, train_loss: 33740.6484375, test_loss: 4213.48193359375
+epoch: 17, train_loss: 33327.4140625, test_loss: 4260.509765625
+epoch: 18, train_loss: 33323.453125, test_loss: 4380.8720703125
+epoch: 19, train_loss: 32627.044921875, test_loss: 4162.87158203125
+epoch: 20, train_loss: 32171.921875, test_loss: 4505.40478515625
+epoch: 21, train_loss: 31599.4375, test_loss: 4222.8994140625
+epoch: 22, train_loss: 30960.595703125, test_loss: 4258.86083984375

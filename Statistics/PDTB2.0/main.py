@@ -58,7 +58,7 @@ with open ('../../data/pdtb2.csv', 'r', newline='') as f:
                     run_statistics(conn, conn_head_sem_class)
 
 # Write result in csv
-with open ('result/result.csv', 'w', encoding='utf-8', newline='') as f:
+with open ('result/result.csv', 'w', newline='') as f:
     csv_writer = csv.writer(f)
 
     csv_writer.writerow(['key', 'conn', 'conn_head_sem_class', 'frequency', 'conn_total_count'])

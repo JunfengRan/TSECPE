@@ -31,6 +31,14 @@ def run_statistics(conn, conn_head_sem_class):
     conn_words_count[conn_words.index(conn)] += 1
     result[keylist.index(key)].frequency += 1
 
+# Transform sem_class into 2-level sem_class
+def transform_sem_class(sem_class):
+    sem_class_parts = sem_class.split('.')
+    if len(sem_class_parts) > 1:
+        return sem_class_parts[0] + '.' + sem_class_parts[1]
+    else:
+        return sem_class_parts[0]
+
 # Load dataset
 with open ('../../data/pdtb2.csv', 'r', newline='') as f:
     csv_reader = csv.reader(f,delimiter=',')
@@ -43,7 +51,7 @@ with open ('../../data/pdtb2.csv', 'r', newline='') as f:
             conn = row[9]
             for index in range(12,14):
                 if row[index] != '':
-                    conn_head_sem_class = row[index]
+                    conn_head_sem_class = transform_sem_class(row[index])
                     if len(tokenizer.tokenize(conn)) == 1:
                         run_statistics(conn, conn_head_sem_class)
         # Conn1
@@ -51,7 +59,7 @@ with open ('../../data/pdtb2.csv', 'r', newline='') as f:
             conn = row[10]
             for index in range(12,14):
                 if row[index] != '':
-                    conn_head_sem_class = row[index]
+                    conn_head_sem_class = transform_sem_class(row[index])
                     if len(tokenizer.tokenize(conn)) == 1:
                         run_statistics(conn, conn_head_sem_class)
         # Conn2
@@ -59,14 +67,15 @@ with open ('../../data/pdtb2.csv', 'r', newline='') as f:
             conn = row[10]
             for index in range(14,16):
                 if row[index] != '':
-                    conn_head_sem_class = row[index]
+                    conn_head_sem_class = transform_sem_class(row[index])
                     if len(tokenizer.tokenize(conn)) == 1:
                         run_statistics(conn, conn_head_sem_class)
 
 # Write result in csv
-with open ('result/result_uniconn.csv', 'w', newline='') as f:
+with open ('result/result_noncause_uniconn.csv', 'w', newline='') as f:
     csv_writer = csv.writer(f)
 
     csv_writer.writerow(['key', 'conn', 'conn_head_sem_class', 'frequency', 'conn_total_count'])
     for item in result:
-        csv_writer.writerow([item.key, item.conn, item.conn_head_sem_class, item.frequency, conn_words_count[conn_words.index(item.conn)]])
+        if item.conn_head_sem_class != 'Contingency.Cause':
+            csv_writer.writerow([item.key, item.conn, item.conn_head_sem_class, item.frequency, conn_words_count[conn_words.index(item.conn)]])

@@ -1,23 +1,3 @@
-'''
-We use the following example for explaination.
-
-4 12
- (12,9), (12,10), (12,11)
-1,null,null,为 尽快 将 女子 救 下
-2,null,null,指挥员 立即 制订 了 救援 方案
-3,null,null,第一组 在 楼下 铺设 救生 气垫
-4,null,null,并 对 周围 无关 人员 进行 疏散
-5,null,null,另一组 队员 快速 爬 上 6 楼
-6,null,null,在 楼 内 对 女子 进行 劝说
-7,null,null,劝说 过程 中
-8,null,null,消防官兵 了解 到
-9,null,null,该 女子 是 由于 对方 拖欠 工程款
-10,null,null,家中 又 急需 用钱
-11,null,null,生活 压力 大
-12,sadness,无奈,无奈 才 选择 跳楼 轻生
-
-'''
-
 import csv
 
 # Define class
@@ -83,19 +63,6 @@ with open ('../../data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encod
                 if refined_content[pair[1] - 1][i] in conn_words:
                     emo_conn_flag = 1
                     emo_conn = refined_content[pair[1] - 1][i]
-
-            '''
-            # Judge double-character word later to cover the result as long as possible
-            for i in range(len(refined_content[pair[1] - 1])):  # Single-character word
-                if refined_content[pair[1] - 1][i] in conn_words:
-                    emo_conn_flag = 1
-                    emo_conn = refined_content[pair[1] - 1][i]
-            for i in range(len(refined_content[pair[1] - 1]) - 1):  # Double-character word
-                possible_conn = refined_content[pair[1] - 1][i] + refined_content[pair[1] - 1][i + 1]
-                if possible_conn in conn_words:
-                    emo_conn_flag = 1
-                    emo_conn = possible_conn
-            '''
             
             # Cause clause
             cau_conn_flag = 0  # Set no conn as default
@@ -105,19 +72,6 @@ with open ('../../data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encod
                 if refined_content[pair[0] - 1][i] in conn_words:
                     cau_conn_flag = 1
                     cau_conn = refined_content[pair[0] - 1][i]
-
-            '''
-            # Judge double-character word later to cover the result as long as possible
-            for i in range(len(refined_content[pair[0] - 1])):  # Single-character word
-                if refined_content[pair[0] - 1][i] in conn_words:
-                    cau_conn_flag = 1
-                    cau_conn = refined_content[pair[0] - 1][i]
-            for i in range(len(refined_content[pair[0] - 1]) - 1):  # Double-character word
-                possible_conn = refined_content[pair[0] - 1][i] + refined_content[pair[0] - 1][i + 1]
-                if possible_conn in conn_words:
-                    cau_conn_flag = 1
-                    cau_conn = possible_conn
-            '''
 
             # Judge structure type
             # type0 (emo, cau), type1 (emo, conn, cau), type2 (conn, emo, cau), type3 (conn, emo, conn, cau)

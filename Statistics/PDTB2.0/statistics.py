@@ -21,6 +21,14 @@ def run_statistics(conn, conn_head_sem_class):
         result.append(new_situation)
     result[keylist.index(conn_head_sem_class)].frequency += 1
 
+# Transform sem_class into 2-level sem_class
+def transform_sem_class(sem_class):
+    sem_class_parts = sem_class.split('.')
+    if len(sem_class_parts) > 1:
+        return sem_class_parts[0] + '.' + sem_class_parts[1]
+    else:
+        return sem_class_parts[0]
+
 # Load dataset
 with open ('../../data/pdtb2.csv', 'r', newline='') as f:
     csv_reader = csv.reader(f,delimiter=',')
@@ -51,7 +59,7 @@ with open ('../../data/pdtb2.csv', 'r', newline='') as f:
                     run_statistics(conn, conn_head_sem_class)
 
 # Write result in csv
-with open ('result/statistics.csv', 'w', encoding='utf-8', newline='') as f:
+with open ('result/statistics.csv', 'w', newline='') as f:
     csv_writer = csv.writer(f)
 
     csv_writer.writerow(['conn_head_sem_class', 'frequency'])

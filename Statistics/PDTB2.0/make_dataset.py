@@ -1,5 +1,8 @@
 import numpy as np
 import csv
+from transformers import AutoTokenizer
+
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 
 # Transform sem_class into 2-level sem_class
 def transform_sem_class(sem_class):
@@ -10,15 +13,16 @@ def transform_sem_class(sem_class):
         return sem_class_parts[0]
 
 # Init csv
-with open ('../../data/dataset.csv', 'w', encoding='utf-8', newline='') as f:
+with open ('../../data/dataset.csv', 'w', newline='') as f:
     csv_writer = csv.writer(f)
     csv_writer.writerow(['relation', 'section', 'filenumber', 'Arg1_RawText', 'Arg2_RawText', 'conn', 'conn_head_sem_class'])
 
 # Write result in csv
 def write_pair(relation, section, filenumber, Arg1_RawText, Arg2_RawText, conn, conn_head_sem_class):
-    with open ('../../data/dataset.csv', 'a', encoding='utf-8', newline='') as f:
-        csv_writer = csv.writer(f)
-        csv_writer.writerow([relation, section, filenumber, Arg1_RawText, Arg2_RawText, conn, conn_head_sem_class])
+    with open ('../../data/dataset.csv', 'a', newline='') as f:
+        if len(tokenizer.tokenize(conn)) == 1:
+            csv_writer = csv.writer(f)
+            csv_writer.writerow([relation, section, filenumber, Arg1_RawText, Arg2_RawText, conn, conn_head_sem_class])
 
 # Load dataset
 with open ('../../data/pdtb2.csv', 'r', newline='') as f:
