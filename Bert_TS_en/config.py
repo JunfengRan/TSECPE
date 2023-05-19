@@ -13,12 +13,12 @@ class Config(object):
         self.roberta_cache_path = 'roberta-base'
         
         # dataset
-        self.dataset_len = 100
+        self.dataset_len = 1941
         self.fold = 10
         self.dataset_path = "../data/discourse_en.csv"
         
         # hyper parameter
-        self.epochs = 1
+        self.epochs = 30
         self.batch_size = 2
         self.lr = 1e-5
         self.tuning_bert_rate = 1e-5
