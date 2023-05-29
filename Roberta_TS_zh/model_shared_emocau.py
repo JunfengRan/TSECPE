@@ -198,11 +198,16 @@ class Network(nn.Module):
                     len2 = len(arg2)
                     
                     # rule for adding connectives
-                    # 1. Search the candidate sentences from the beginning of the sentence to the end, requiring a continuous sequence of connectives, otherwise stop. For example, "but because".
-                    # 2. If there is a single causal connective in the sequence of connectives, directly extract the single causal connective. After deleting the connective sequence, select the single-causal connective as conn.
-                    # 3. If there is no single causal connective in the connective sequence, delete the connective sequence and select the connective word with Bert.
-                    # 4. If there is no connective sequence, select the connective directly with Bert.
-                    # 5. If the sentence itself forms a pair with itself, extract sequences of connecting words from any other position in the sentence (excluding the sequence at the beginning). If there is a single causal connective in the sequence of connectives, directly extract the single-causal connective and insert it at the beginning (do not delete). If there are multiple choice, we choose the first one; If there is no single causal connective, select the connective directly with Bert.
+                    # 1. Search the candidate clauses from the beginning of the clause to the end, requiring a continuous sequence of connectives, otherwise stop.
+                    # For example, "but because" is a continuous sequence of connectives.
+
+                    # 2. If there is a connective sequence, we delete the connective sequence and predict the connective with Bert or Roberta.
+                    # If there is no connective sequence, select the connective directly with Bert or Roberta.
+
+                    # 3. If the clause itself forms a pair with itself, we delete the first sequence of connectives and extract sequences of connectives from any other position in the clause (excluding the sequence at the beginning).
+                    # If there is a single causal connective in the sequence of connectives, directly extract the single-causal connective and choose it as our desired connectives.
+                    # If there are multiple choice, we choose the first one; If there is no single causal connective, select the connective directly with Bert or Roberta.
+                    
                     if arg1_start != arg2_start:
                         # step 1
                         conn = None
@@ -212,18 +217,10 @@ class Network(nn.Module):
                                 conn_seq.append(arg2[pos])
                             else:
                                 break
+                        # step 2
                         if conn_seq != []:
-                            for item in conn_seq:
-                                # step 2
-                                if item in single_causal_conn_token:
-                                    arg2 = arg2[len(conn_seq):]
-                                    conn = item
-                                    break
-                            # step 3
-                            if conn == None:
-                                arg2 = arg2[len(conn_seq):]
-                                len2 = len2 - len(conn_seq)
-                        # step 3 & step 4
+                            arg2 = arg2[len(conn_seq):]
+                            len2 = len2 - len(conn_seq)
                         sep_token = torch.tensor([self.tokenizer.convert_tokens_to_ids('[SEP]')])
                         mask_token = torch.tensor([self.tokenizer.convert_tokens_to_ids('[MASK]')])
                         inputs = torch.cat([arg1, sep_token, mask_token, arg2])
@@ -242,7 +239,7 @@ class Network(nn.Module):
                         max_index = torch.argmax(torch.tensor(candidate_conn_score))
                         conn = candidate_conn_token[max_index]
 
-                    # step 5
+                    # step 3
                     else:
                         conn = None
                         conn_seq = []
@@ -341,8 +338,8 @@ class Network(nn.Module):
                 clause_start.append(clause_start[j] + clause_len[i][j])
             for j in range(len(cause_pos[i])):
                 for k in range(doc_len[i]):
-                    arg1_start = clause_start[cause_pos[i][j] - 1]
-                    arg1_end = clause_start[cause_pos[i][j]]
+                    arg1_start = clause_start[emotion_pos[i][j] - 1]
+                    arg1_end = clause_start[emotion_pos[i][j]]
                     arg2_start = clause_start[k]
                     arg2_end = clause_start[k + 1]
                     arg1 = discourse[i][arg1_start: arg1_end]
@@ -351,11 +348,16 @@ class Network(nn.Module):
                     len2 = len(arg2)
                     
                     # rule for adding connectives
-                    # 1. Search the candidate sentences from the beginning of the sentence to the end, requiring a continuous sequence of connectives, otherwise stop. For example, "but because".
-                    # 2. If there is a single causal connective in the sequence of connectives, directly extract the single causal connective. After deleting the connective sequence, select the single-causal connective as conn.
-                    # 3. If there is no single causal connective in the connective sequence, delete the connective sequence and select the connective word with Bert.
-                    # 4. If there is no connective sequence, select the connective directly with Bert.
-                    # 5. If the sentence itself forms a pair with itself, extract sequences of connecting words from any other position in the sentence (excluding the sequence at the beginning). If there is a single causal connective in the sequence of connectives, directly extract the single-causal connective and insert it at the beginning (do not delete). If there are multiple choice, we choose the first one; If there is no single causal connective, select the connective directly with Bert.
+                    # 1. Search the candidate clauses from the beginning of the clause to the end, requiring a continuous sequence of connectives, otherwise stop.
+                    # For example, "but because" is a continuous sequence of connectives.
+
+                    # 2. If there is a connective sequence, we delete the connective sequence and predict the connective with Bert or Roberta.
+                    # If there is no connective sequence, select the connective directly with Bert or Roberta.
+
+                    # 3. If the clause itself forms a pair with itself, we delete the first sequence of connectives and extract sequences of connectives from any other position in the clause (excluding the sequence at the beginning).
+                    # If there is a single causal connective in the sequence of connectives, directly extract the single-causal connective and choose it as our desired connectives.
+                    # If there are multiple choice, we choose the first one; If there is no single causal connective, select the connective directly with Bert or Roberta.
+                    
                     if arg1_start != arg2_start:
                         # step 1
                         conn = None
@@ -365,18 +367,10 @@ class Network(nn.Module):
                                 conn_seq.append(arg2[pos])
                             else:
                                 break
+                        # step 2
                         if conn_seq != []:
-                            for item in conn_seq:
-                                # step 2
-                                if item in single_causal_conn_token:
-                                    arg2 = arg2[len(conn_seq):]
-                                    conn = item
-                                    break
-                            # step 3
-                            if conn == None:
-                                arg2 = arg2[len(conn_seq):]
-                                len2 = len2 - len(conn_seq)
-                        # step 3 & step 4
+                            arg2 = arg2[len(conn_seq):]
+                            len2 = len2 - len(conn_seq)
                         sep_token = torch.tensor([self.tokenizer.convert_tokens_to_ids('[SEP]')])
                         mask_token = torch.tensor([self.tokenizer.convert_tokens_to_ids('[MASK]')])
                         inputs = torch.cat([arg1, sep_token, mask_token, arg2])
@@ -395,7 +389,7 @@ class Network(nn.Module):
                         max_index = torch.argmax(torch.tensor(candidate_conn_score))
                         conn = candidate_conn_token[max_index]
 
-                    # step 5
+                    # step 3
                     else:
                         conn = None
                         conn_seq = []
@@ -458,7 +452,7 @@ class Network(nn.Module):
                         conn_embedding = self.roberta_eval(inputs.to(DEVICE), mask.to(DEVICE), segement.to(DEVICE))[0][0][len1 + 1]
                     
                     # Stack three embeddings for one pair presentation
-                    pair_h = torch.cat([doc_sents_h[i][k], conn_embedding, doc_sents_h[i][cause_pos[i][j] - 1]], dim=-1)  # shape: 3 * feat_dim
+                    pair_h = torch.cat([doc_sents_h[i][emotion_pos[i][j] - 1], conn_embedding, doc_sents_h[i][k]], dim=-1)  # shape: 3 * feat_dim
                     
                     # Concatenate pairs for whole doc answer
                     if pairs_h.size(-1) == 0:

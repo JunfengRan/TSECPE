@@ -2,11 +2,11 @@ import csv
 
 # Define class
 class Statistics():
-    def __init__(self, key, emo_conn, cau_conn, type, dis):
+    def __init__(self, key, emo_conn, cau_conn, typ, dis):
         self.key = key
         self.emo_conn = emo_conn
         self.cau_conn = cau_conn
-        self.type = type
+        self.typ = typ
         self.dis = dis
         self.frequency = 0
 
@@ -76,20 +76,20 @@ with open ('../../data/all_data_pair.txt', 'r', encoding='utf-8') as f:  # Encod
             # Judge structure type
             # type0 (emo, cau), type1 (emo, conn, cau), type2 (conn, emo, cau), type3 (conn, emo, conn, cau)
             # We always rewrite the sentence to make sure emo is ahead of cau for our research
-            type = 0
+            typ = 0
             if cau_conn_flag == 1:
-                type = 1
+                typ = 1
             if emo_conn_flag == 1:
-                type = 2
+                typ = 2
             if cau_conn_flag == 1 & emo_conn_flag == 1:
-                type = 3
+                typ = 3
 
             # Get statistics
-            pair_key = emo_conn + cau_conn + str(type) + str(dis)  # Set unique key
+            pair_key = emo_conn + cau_conn + str(typ) + str(dis)  # Set unique key
 
             if pair_key not in key:
                 key.append(pair_key)
-                new_situation = Statistics(pair_key, emo_conn, cau_conn, type, dis)
+                new_situation = Statistics(pair_key, emo_conn, cau_conn, typ, dis)
                 result.append(new_situation)
             
             result[key.index(pair_key)].frequency += 1
@@ -102,4 +102,4 @@ with open ('result/result.csv', 'w', encoding='utf-8', newline='') as f:
 
     csv_writer.writerow(['pair_key', 'emo_conn', 'cau_conn', 'type', 'dis', 'frequency'])
     for item in result:
-        csv_writer.writerow([item.key, item.emo_conn, item.cau_conn, item.type, item.dis, item.frequency])
+        csv_writer.writerow([item.key, item.emo_conn, item.cau_conn, item.typ, item.dis, item.frequency])

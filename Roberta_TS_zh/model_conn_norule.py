@@ -271,101 +271,23 @@ class Network(nn.Module):
                     len1 = len(arg1)
                     len2 = len(arg2)
                     
-                    # rule for adding connectives
-                    # 1. Search the candidate sentences from the beginning of the sentence to the end, requiring a continuous sequence of connectives, otherwise stop. For example, "but because".
-                    # 2. If there is a single causal connective in the sequence of connectives, directly extract the single causal connective. After deleting the connective sequence, select the single-causal connective as conn.
-                    # 3. If there is no single causal connective in the connective sequence, delete the connective sequence and select the connective word with Bert.
-                    # 4. If there is no connective sequence, select the connective directly with Bert.
-                    # 5. If the sentence itself forms a pair with itself, extract sequences of connecting words from any other position in the sentence (excluding the sequence at the beginning). If there is a single causal connective in the sequence of connectives, directly extract the single-causal connective and insert it at the beginning (do not delete). If there are multiple choice, we choose the first one; If there is no single causal connective, select the connective directly with Bert.
-                    if arg1_start != arg2_start:
-                        # step 1
-                        conn = None
-                        conn_seq = []
-                        for pos in range(len2):
-                            if arg2[pos] in candidate_conn_token:
-                                conn_seq.append(arg2[pos])
-                            else:
-                                break
-                        if conn_seq != []:
-                            for item in conn_seq:
-                                # step 2
-                                if item in single_causal_conn_token:
-                                    arg2 = arg2[len(conn_seq):]
-                                    conn = item
-                                    break
-                            # step 3
-                            if conn == None:
-                                arg2 = arg2[len(conn_seq):]
-                                len2 = len2 - len(conn_seq)
-                        # step 3 & step 4
-                        sep_token = torch.tensor([self.tokenizer.convert_tokens_to_ids('[SEP]')])
-                        mask_token = torch.tensor([self.tokenizer.convert_tokens_to_ids('[MASK]')])
-                        inputs = torch.cat([arg1, sep_token, mask_token, arg2])
-                        inputs = F.pad(inputs, (0, 512 - inputs.size(-1)), 'constant', 0).unsqueeze(0)
-                        mask = torch.tensor([1] * (len1 + 2 + len2)+ [0] * (510 - len1 - len2)).unsqueeze(0)
-                        segement = torch.tensor([0] * (len1 + 1) + [1] * (511 - len1)).unsqueeze(0)
+                    sep_token = torch.tensor([self.tokenizer.convert_tokens_to_ids('[SEP]')])
+                    mask_token = torch.tensor([self.tokenizer.convert_tokens_to_ids('[MASK]')])
+                    inputs = torch.cat([arg1, sep_token, mask_token, arg2])
+                    inputs = F.pad(inputs, (0, 512 - inputs.size(-1)), 'constant', 0).unsqueeze(0)
+                    mask = torch.tensor([1] * (len1 + 2 + len2)+ [0] * (510 - len1 - len2)).unsqueeze(0)
+                    segement = torch.tensor([0] * (len1 + 1) + [1] * (511 - len1)).unsqueeze(0)
+                
+                    # Get mask distribution
+                    with torch.no_grad():
+                        mask_distribution = self.roberta_mask(inputs.to(DEVICE), mask.to(DEVICE), segement.to(DEVICE))[0][0][len1 + 1]
                     
-                        # Get mask distribution
-                        with torch.no_grad():
-                            mask_distribution = self.roberta_mask(inputs.to(DEVICE), mask.to(DEVICE), segement.to(DEVICE))[0][0][len1 + 1]
-                        
-                        # Get conn
-                        candidate_conn_score = []
-                        for idx in range(len(candidate_conn_token)):
-                            candidate_conn_score.extend(mask_distribution[candidate_conn_token[idx]].cpu())
-                        max_index = torch.argmax(torch.tensor(candidate_conn_score))
-                        conn = candidate_conn_token[max_index]
-
-                    # step 5
-                    else:
-                        conn = None
-                        conn_seq = []
-                        conn_seqs = []
-                        for pos in range(len2):
-                            if arg2[pos] in candidate_conn_token:
-                                conn_seq.append(arg2[pos])
-                            else:
-                                break
-                        arg2 = arg2[len(conn_seq):]
-                        len2 = len2 - len(conn_seq)
-                        pos = 0
-                        while pos < len2:
-                            if arg2[pos] in candidate_conn_token:
-                                conn_seq = []
-                                while pos < len2:
-                                    if arg2[pos] in candidate_conn_token:
-                                        conn_seq.append(arg2[pos])
-                                        pos += 1
-                                    else:
-                                        break
-                                conn_seqs.append(conn_seq)
-                            pos += 1
-                        if conn_seqs != []:
-                            for idx in range(len(conn_seqs)):
-                                for item in conn_seqs[idx]:
-                                    if item in cause_uniconn_token:
-                                        conn = item
-                                        break
-                                if conn != None:
-                                    break
-                        if conn == None:
-                            sep_token = torch.tensor([self.tokenizer.convert_tokens_to_ids('[SEP]')])
-                            mask_token = torch.tensor([self.tokenizer.convert_tokens_to_ids('[MASK]')])
-                            inputs = torch.cat([arg1, sep_token, mask_token, arg2])
-                            inputs = F.pad(inputs, (0, 512 - inputs.size(-1)), 'constant', 0).unsqueeze(0)
-                            mask = torch.tensor([1] * (len1 + 2 + len2)+ [0] * (510 - len1 - len2)).unsqueeze(0)
-                            segement = torch.tensor([0] * (len1 + 1) + [1] * (511 - len1)).unsqueeze(0)
-                        
-                            # Get mask distribution
-                            with torch.no_grad():
-                                mask_distribution = self.roberta_mask(inputs.to(DEVICE), mask.to(DEVICE), segement.to(DEVICE))[0][0][len1 + 1]
-                            
-                            # Get conn
-                            candidate_conn_score = []
-                            for idx in range(len(candidate_conn_token)):
-                                candidate_conn_score.extend(mask_distribution[candidate_conn_token[idx]].cpu())
-                            max_index = torch.argmax(torch.tensor(candidate_conn_score))
-                            conn = candidate_conn_token[max_index]
+                    # Get conn
+                    candidate_conn_score = []
+                    for idx in range(len(candidate_conn_token)):
+                        candidate_conn_score.extend(mask_distribution[candidate_conn_token[idx]].cpu())
+                    max_index = torch.argmax(torch.tensor(candidate_conn_score))
+                    conn = candidate_conn_token[max_index]
                     
                     # Get conn embedding
                     conn = torch.tensor(conn)
