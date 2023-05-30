@@ -338,8 +338,8 @@ class Network(nn.Module):
                 clause_start.append(clause_start[j] + clause_len[i][j])
             for j in range(len(cause_pos[i])):
                 for k in range(doc_len[i]):
-                    arg1_start = clause_start[emotion_pos[i][j] - 1]
-                    arg1_end = clause_start[emotion_pos[i][j]]
+                    arg1_start = clause_start[cause_pos[i][j] - 1]
+                    arg1_end = clause_start[cause_pos[i][j]]
                     arg2_start = clause_start[k]
                     arg2_end = clause_start[k + 1]
                     arg1 = discourse[i][arg1_start: arg1_end]
@@ -452,7 +452,7 @@ class Network(nn.Module):
                         conn_embedding = self.roberta_eval(inputs.to(DEVICE), mask.to(DEVICE), segement.to(DEVICE))[0][0][len1 + 1]
                     
                     # Stack three embeddings for one pair presentation
-                    pair_h = torch.cat([doc_sents_h[i][emotion_pos[i][j] - 1], conn_embedding, doc_sents_h[i][k]], dim=-1)  # shape: 3 * feat_dim
+                    pair_h = torch.cat([doc_sents_h[i][k], conn_embedding, doc_sents_h[i][cause_pos[i][j] - 1]], dim=-1)  # shape: 3 * feat_dim
                     
                     # Concatenate pairs for whole doc answer
                     if pairs_h.size(-1) == 0:
