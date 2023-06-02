@@ -244,7 +244,7 @@ def main(configs, train_loader, test_loader, tokenizer):
                 max_result_pair = eval_pair
     
                 state_dict = {'model': model.state_dict(), 'result': max_result_pair}
-                torch.save(state_dict, 'model/model_noconn_fold{}.pth'.format(configs.fold_id))
+                torch.save(state_dict, 'model/model_noconn.pth')
             else:
                 early_stop_flag += 1
         if early_stop_flag >= 10:
@@ -332,7 +332,6 @@ if __name__ == '__main__':
     device = DEVICE
     
     tokenizer = AutoTokenizer.from_pretrained(configs.roberta_cache_path)
-    model = Network(configs).to(DEVICE)
     
     fold = configs.fold
     i = configs.fold_id

@@ -5,7 +5,7 @@ import torch
 from torch.nn import functional as F
 from torch.utils.data import Dataset, DataLoader
 from transformers import AdamW, get_linear_schedule_with_warmup, BertTokenizer, AutoTokenizer
-from model_noconn import Network
+from model_conn_true import Network
 import datetime
 import numpy as np
 import pandas as pd
@@ -223,9 +223,9 @@ def main(configs, train_loader, test_loader, tokenizer):
             section, discourse, word_count, doc_len, clause_len, ec_emotion_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, ec_true_pairs, ce_true_pairs, discourse_mask, segment_mask, query_len, ec_emo_ans, ec_emo_ans_mask, ec_emo_cau_ans, ec_emo_cau_ans_mask, ce_cau_ans, ce_cau_ans_mask, ce_cau_emo_ans, ce_cau_emo_ans_mask, ec_pair_count, ce_pair_count, discourse_adj = batch
 
             ec_emo_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, doc_len, discourse_adj, 'emo')
-            ec_emo_cau_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, doc_len, discourse_adj, 'emo_cau')
+            ec_emo_cau_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, doc_len, discourse_adj, 'emo_cau', ec_true_pairs, ce_true_pairs)
             ce_cau_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, doc_len, discourse_adj, 'cau')
-            ce_cau_emo_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, doc_len, discourse_adj, 'cau_emo')
+            ce_cau_emo_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, doc_len, discourse_adj, 'cau_emo', ec_true_pairs, ce_true_pairs)
             
             loss_ec_emo = model.loss_pre(ec_emo_pred, ec_emo_ans, ec_emo_ans_mask)
             loss_ec_emo_cau = model.loss_pre(ec_emo_cau_pred, ec_emo_cau_ans, ec_emo_cau_ans_mask)
@@ -254,7 +254,7 @@ def main(configs, train_loader, test_loader, tokenizer):
                 max_result_pair = eval_pair
     
                 state_dict = {'model': model.state_dict(), 'result': max_result_pair}
-                torch.save(state_dict, 'model/model_noconn.pth')
+                torch.save(state_dict, 'model/model_conn_true.pth')
             else:
                 early_stop_flag += 1
         if early_stop_flag >= 10:

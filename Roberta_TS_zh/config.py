@@ -1,5 +1,5 @@
 import torch
-DEVICE = torch.device('cuda:2' if torch.cuda.is_available() else 'cpu')
+DEVICE = torch.device('cuda:4' if torch.cuda.is_available() else 'cpu')
 # DEVICE = torch.device('cpu')
 
 TORCH_SEED = 129
