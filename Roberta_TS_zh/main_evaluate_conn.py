@@ -57,7 +57,7 @@ class Discourse(Dataset):
 
 
 # evaluate one batch
-def evaluate_one_batch(configs, batch, model, tokenizer):
+def evaluate_one_batch_ec(configs, batch, model, tokenizer):
     # 1 doc has 3 emotion clauses and 4 cause clauses at most, respectively
     # 1 emotion clause has 3 corresponding cause clauses at most, 1 cause clause has only 1 corresponding emotion clause
     # set emotion slot to 8 for padding
@@ -177,11 +177,147 @@ def evaluate_one_batch(configs, batch, model, tokenizer):
 
 
 # evaluate step
-def evaluate(configs, test_loader, model, tokenizer):
+def evaluate_ec(configs, test_loader, model, tokenizer):
     model.eval()
     all_emo, all_cau, all_pair = [0, 0, 0], [0, 0, 0], [0, 0, 0]
     for batch in test_loader:
-        emo, cau, pair = evaluate_one_batch(configs, batch, model, tokenizer)
+        emo, cau, pair = evaluate_one_batch_ec(configs, batch, model, tokenizer)
+        print(emo, cau, pair)
+        for i in range(3):
+            all_emo[i] += emo[i]
+            all_cau[i] += cau[i]
+            all_pair[i] += pair[i]
+
+    print(all_emo, all_cau, all_pair)
+    
+    eval_emo = eval_func(all_emo)
+    eval_cau = eval_func(all_cau)
+    eval_pair = eval_func(all_pair)
+    return eval_emo, eval_cau, eval_pair
+
+
+# evaluate one batch
+def evaluate_one_batch_ce(configs, batch, model, tokenizer):
+    # 1 doc has 3 emotion clauses and 4 cause clauses at most, respectively
+    # 1 emotion clause has 3 corresponding cause clauses at most, 1 cause clause has only 1 corresponding emotion clause
+    # set emotion slot to 8 for padding
+    
+    section, discourse, word_count, doc_len, clause_len, ec_emotion_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, ec_true_pairs, ce_true_pairs, discourse_mask, segment_mask, query_len, ec_emo_ans, ec_emo_ans_mask, ec_emo_cau_ans, ec_emo_cau_ans_mask, ce_cau_ans, ce_cau_ans_mask, ce_cau_emo_ans, ce_cau_emo_ans_mask, ec_pair_count, ce_pair_count, discourse_adj = batch
+    
+    # change batch_size to len(section) for unification
+    batch_size = len(section)
+
+    pred_emos = []
+    pred_caus = []
+    pred_pairs = []
+    pred_pairs_pro = []
+    pred_emos_single = []
+    pred_caus_single = []
+
+    true_emos = []
+    true_caus = []
+    true_pairs = ce_true_pairs
+    for i in range(batch_size):
+        true_caus.append(ce_cause_pos[i])
+        emotion_pos = ce_emotion_pos[i]
+        emo_list = []
+        for cau_index in range(len(emotion_pos)):
+            for emo in emotion_pos[cau_index]:
+                if emo not in emo_list:
+                    emo_list.append(emo)
+        true_emos.append(emo_list)
+
+    # cause step
+    cau_pred = model(discourse, discourse_mask, segment_mask, query_len, clause_len, ec_emotion_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, doc_len, discourse_adj, 'cau')
+    ce_cau_ans_mask = ce_cau_ans_mask.to(DEVICE)
+    temp_caus_prob = []
+    for i in range(batch_size):
+        temp_caus_prob.append(cau_pred[i].masked_select(ce_cau_ans_mask[i].bool()).cpu().numpy().tolist())
+    pred_cause_pos = []
+    for i in range(batch_size):
+        pred_cau = []
+        pred_cau_single = []
+        for idx in range(len(temp_caus_prob[i])):
+            if temp_caus_prob[i][idx] > 0.5:
+                pred_cau.append(idx)
+                pred_cau_single.append(idx + 1)
+
+        pred_cau_pos = pred_cau_single
+        if pred_cau_pos == []:
+            pred_cau_pos = [1]
+        pred_caus.append(pred_cau)
+        pred_caus_single.append(pred_cau_single)
+        pred_cause_pos.append(pred_cau_pos)
+
+    print(section)
+    print(pred_caus)
+
+    # cause emotion step
+    emo_pred, conns_list = model(discourse, discourse_mask, segment_mask, query_len, clause_len, pred_cause_pos, ec_cause_pos, ce_cause_pos, ce_emotion_pos, doc_len, discourse_adj, 'cau_emo')  
+    temp_emos_prob = emo_pred.cpu().numpy().tolist()
+    for i in range(batch_size):
+        pred_emo = []
+        pred_emo_single = []
+        pred_pair = []
+        pred_pair_pro = []
+        for idx_cau in pred_caus[i]:
+            for idx_emo in range(doc_len[i]):
+                if temp_emos_prob[i][pred_caus[i].index(idx_cau) * doc_len[i] + idx_emo] > 0.5 and abs(idx_emo - idx_cau) <= 11:
+                    if idx_emo + 1 not in pred_emo_single:
+                        pred_emo.append(idx_emo)
+                        pred_emo_single.append(idx_emo + 1)
+                    prob_t = temp_caus_prob[i][idx_cau] * temp_emos_prob[i][pred_caus[i].index(idx_cau) * doc_len[i] + idx_emo]
+                    if idx_cau - idx_emo >= 0 and idx_cau - idx_emo <= 2:
+                        pass
+                    else:
+                        prob_t *= 0.9
+                    pred_pair_pro.append(prob_t)
+                    pred_pair.append([idx_cau + 1, idx_emo + 1])
+        
+        pred_emos.append(pred_emo)
+        pred_emos_single.append(pred_emo_single)
+        pred_pairs.append(pred_pair)
+        pred_pairs_pro.append(pred_pair_pro)
+
+    pred_emos_final = []
+    pred_caus_final = []
+    pred_pairs_final = []
+
+    for i in range(batch_size):
+        pred_pair_final = []
+        for idx, pair in enumerate(pred_pairs[i]):
+            if pred_pairs_pro[i][idx] > 0.5:
+                pred_pair_final.append(pair)
+        pred_pairs_final.append(pred_pair_final)
+    
+    print(conns_list)
+    print(pred_pairs_final)
+    
+    for i in range(batch_size):
+        pred_emo_final = []
+        pred_cau_final = []
+        for pair in pred_pairs_final[i]:
+            if pair[0] not in pred_cau_final:
+                pred_cau_final.append(pair[0])
+            if pair[1] not in pred_emo_final:
+                pred_emo_final.append(pair[1])
+        pred_emos_final.append(pred_emo_final)
+        pred_caus_final.append(pred_cau_final)
+
+    metric_e, metric_c, metric_p = [0, 0, 0], [0, 0, 0], [0, 0, 0]
+    
+    for i in range(batch_size):
+        e, c, p = cal_metric(pred_emos_final[i], true_emos[i], pred_caus_final[i], true_caus[i], pred_pairs_final[i], true_pairs[i], doc_len[i])
+        metric_e, metric_c, metric_p = [item1 + item2 for item1, item2 in zip(metric_e, e)], [item1 + item2 for item1, item2 in zip(metric_c, c)], [item1 + item2 for item1, item2 in zip(metric_p, p)]
+    return metric_e, metric_c, metric_p
+
+
+# evaluate step
+def evaluate_ce(configs, test_loader, model, tokenizer):
+    model.eval()
+    all_emo, all_cau, all_pair = [0, 0, 0], [0, 0, 0], [0, 0, 0]
+    for batch in test_loader:
+        emo, cau, pair = evaluate_one_batch_ce(configs, batch, model, tokenizer)
         print(emo, cau, pair)
         for i in range(3):
             all_emo[i] += emo[i]
@@ -208,10 +344,15 @@ def main(configs, train_loader, test_loader, tokenizer):
     # evaluate
     model.eval()
     with torch.no_grad():
-        eval_emo, eval_cau, eval_pair = evaluate(configs, test_loader, model, tokenizer)
+        eval_emo, eval_cau, eval_pair = evaluate_ec(configs, test_loader, model, tokenizer)
         
     print(eval_emo, eval_cau, eval_pair)
-            
+    
+    with torch.no_grad():
+        eval_emo, eval_cau, eval_pair = evaluate_ce(configs, test_loader, model, tokenizer)
+        
+    print(eval_emo, eval_cau, eval_pair)
+    
     return None
 
 
@@ -337,10 +478,8 @@ if __name__ == '__main__':
     
     train_loader = None
     
-    # test_start = int(i / fold * dataset_len) + 1
-    # test_end = int((i + 1) / fold * dataset_len) + 1
-    test_start = 1920
-    test_end = 1941
+    test_start = int(i / fold * dataset_len) + 1
+    test_end = int((i + 1) / fold * dataset_len) + 1
     test_dataset = Discourse(tokenizer, configs.dataset_path, test_start, test_end)
     test_loader = DataLoader(dataset=test_dataset, shuffle=False, batch_size=configs.batch_size, collate_fn=my_collate_fn, drop_last=True)
     
