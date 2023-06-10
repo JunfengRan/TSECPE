@@ -14,7 +14,7 @@ class Config(object):
         # dataset
         self.dataset_len = 2105
         self.fold = 10
-        self.fold_id = 0
+        self.fold_id = 9
         self.dataset_path = "../data/discourse_zh.csv"
         
         # hyper parameter

@@ -339,7 +339,7 @@ def main(configs, train_loader, test_loader, tokenizer):
 
     # model
     model = Network(configs).to(DEVICE)
-    model.load_state_dict(torch.load('model/model_conn.pth')['model'])
+    model.load_state_dict(torch.load('model/model_conn_true_fold{}.pth'.format(configs.fold_id))['model'])
 
     # evaluate
     model.eval()

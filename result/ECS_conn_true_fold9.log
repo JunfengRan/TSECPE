@@ -1,0 +1,239 @@
+nohup: ignoring input
+Some weights of the model checkpoint at hfl/chinese-roberta-wwm-ext were not used when initializing BertModel: ['cls.predictions.transform.dense.bias', 'cls.predictions.bias', 'cls.seq_relationship.bias', 'cls.predictions.decoder.weight', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.weight']
+- This IS expected if you are initializing BertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of the model checkpoint at hfl/chinese-roberta-wwm-ext were not used when initializing BertForMaskedLM: ['cls.seq_relationship.weight', 'cls.seq_relationship.bias']
+- This IS expected if you are initializing BertForMaskedLM from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForMaskedLM from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of the model checkpoint at hfl/chinese-roberta-wwm-ext were not used when initializing BertModel: ['cls.predictions.transform.dense.bias', 'cls.predictions.bias', 'cls.seq_relationship.bias', 'cls.predictions.decoder.weight', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.weight']
+- This IS expected if you are initializing BertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of the model checkpoint at hfl/chinese-roberta-wwm-ext were not used when initializing BertModel: ['cls.predictions.transform.dense.bias', 'cls.predictions.bias', 'cls.seq_relationship.bias', 'cls.predictions.decoder.weight', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.weight']
+- This IS expected if you are initializing BertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of the model checkpoint at hfl/chinese-roberta-wwm-ext were not used when initializing BertForMaskedLM: ['cls.seq_relationship.weight', 'cls.seq_relationship.bias']
+- This IS expected if you are initializing BertForMaskedLM from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertForMaskedLM from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of the model checkpoint at hfl/chinese-roberta-wwm-ext were not used when initializing BertModel: ['cls.predictions.transform.dense.bias', 'cls.predictions.bias', 'cls.seq_relationship.bias', 'cls.predictions.decoder.weight', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.transform.dense.weight', 'cls.seq_relationship.weight']
+- This IS expected if you are initializing BertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing BertModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+/home/junfeng/miniconda3/envs/mytransformer/lib/python3.9/site-packages/transformers/optimization.py:391: FutureWarning: This implementation of AdamW is deprecated and will be removed in a future version. Use the PyTorch implementation torch.optim.AdamW instead, or set `no_deprecation_warning=True` to disable this warning
+  warnings.warn(
+epoch: 1, step: 0, loss_emo: 0.7689006924629211, loss_emo_cau: 0.6541711688041687, loss: 1.4230718612670898
+epoch: 1, step: 100, loss_emo: 0.722442090511322, loss_emo_cau: 0.6492016911506653, loss: 1.3716437816619873
+epoch: 1, step: 200, loss_emo: 0.6001798510551453, loss_emo_cau: 0.5316101908683777, loss: 1.131790041923523
+epoch: 1, step: 300, loss_emo: 0.4448288381099701, loss_emo_cau: 0.4140435457229614, loss: 0.8588724136352539
+epoch: 1, step: 400, loss_emo: 0.2206336408853531, loss_emo_cau: 0.22085481882095337, loss: 0.44148844480514526
+epoch: 1, step: 500, loss_emo: 0.3065517246723175, loss_emo_cau: 0.2871827185153961, loss: 0.5937344431877136
+epoch: 1, step: 600, loss_emo: 0.22691968083381653, loss_emo_cau: 0.21953408420085907, loss: 0.4464537501335144
+epoch: 1, step: 700, loss_emo: 0.3293614983558655, loss_emo_cau: 0.34582093358039856, loss: 0.6751824617385864
+epoch: 1, step: 800, loss_emo: 0.40623658895492554, loss_emo_cau: 0.4041796028614044, loss: 0.8104162216186523
+epoch: 2, step: 0, loss_emo: 0.21475869417190552, loss_emo_cau: 0.24742528796195984, loss: 0.46218398213386536
+epoch: 2, step: 100, loss_emo: 0.3415551483631134, loss_emo_cau: 0.35986825823783875, loss: 0.7014234066009521
+epoch: 2, step: 200, loss_emo: 0.13314487040042877, loss_emo_cau: 0.3053961992263794, loss: 0.438541054725647
+epoch: 2, step: 300, loss_emo: 0.0892384797334671, loss_emo_cau: 0.23379932343959808, loss: 0.3230378031730652
+epoch: 2, step: 400, loss_emo: 0.0634208470582962, loss_emo_cau: 0.22884298861026764, loss: 0.29226383566856384
+epoch: 2, step: 500, loss_emo: 0.19689032435417175, loss_emo_cau: 0.297435462474823, loss: 0.49432578682899475
+epoch: 2, step: 600, loss_emo: 0.2921066880226135, loss_emo_cau: 0.5740340948104858, loss: 0.8661407828330994
+epoch: 2, step: 700, loss_emo: 0.053557779639959335, loss_emo_cau: 0.17574118077754974, loss: 0.22929896414279938
+epoch: 2, step: 800, loss_emo: 0.04016175866127014, loss_emo_cau: 0.1593349128961563, loss: 0.19949667155742645
+epoch: 3, step: 0, loss_emo: 0.10466805845499039, loss_emo_cau: 0.1901017278432846, loss: 0.2947697937488556
+epoch: 3, step: 100, loss_emo: 0.08784142136573792, loss_emo_cau: 0.2278287261724472, loss: 0.3156701326370239
+epoch: 3, step: 200, loss_emo: 0.0667562335729599, loss_emo_cau: 0.27142661809921265, loss: 0.33818286657333374
+epoch: 3, step: 300, loss_emo: 0.024269094690680504, loss_emo_cau: 0.14751066267490387, loss: 0.17177975177764893
+epoch: 3, step: 400, loss_emo: 0.025111539289355278, loss_emo_cau: 0.10664665699005127, loss: 0.1317581981420517
+epoch: 3, step: 500, loss_emo: 0.12095978111028671, loss_emo_cau: 0.17533259093761444, loss: 0.29629236459732056
+epoch: 3, step: 600, loss_emo: 0.03337160497903824, loss_emo_cau: 0.1789974421262741, loss: 0.21236905455589294
+epoch: 3, step: 700, loss_emo: 0.02801877073943615, loss_emo_cau: 0.10601940006017685, loss: 0.13403816521167755
+epoch: 3, step: 800, loss_emo: 0.011963636614382267, loss_emo_cau: 0.07180958986282349, loss: 0.08377322554588318
+epoch: 4, step: 0, loss_emo: 0.0191420316696167, loss_emo_cau: 0.21198402345180511, loss: 0.23112605512142181
+epoch: 4, step: 100, loss_emo: 0.0647246390581131, loss_emo_cau: 0.14028400182724, loss: 0.2050086408853531
+epoch: 4, step: 200, loss_emo: 0.020586779341101646, loss_emo_cau: 0.04875770956277847, loss: 0.06934449076652527
+epoch: 4, step: 300, loss_emo: 0.12470459938049316, loss_emo_cau: 0.2589040994644165, loss: 0.38360869884490967
+epoch: 4, step: 400, loss_emo: 0.07978924363851547, loss_emo_cau: 0.16003581881523132, loss: 0.2398250699043274
+epoch: 4, step: 500, loss_emo: 0.03966989740729332, loss_emo_cau: 0.12916292250156403, loss: 0.16883282363414764
+epoch: 4, step: 600, loss_emo: 0.011081989854574203, loss_emo_cau: 0.08555012941360474, loss: 0.09663212299346924
+epoch: 4, step: 700, loss_emo: 0.14329352974891663, loss_emo_cau: 0.18049176037311554, loss: 0.32378530502319336
+epoch: 4, step: 800, loss_emo: 0.03609756380319595, loss_emo_cau: 0.07630041241645813, loss: 0.11239797621965408
+epoch: 5, step: 0, loss_emo: 0.008136874996125698, loss_emo_cau: 0.10470584779977798, loss: 0.11284272372722626
+epoch: 5, step: 100, loss_emo: 0.044466782361269, loss_emo_cau: 0.05356937274336815, loss: 0.09803615510463715
+epoch: 5, step: 200, loss_emo: 0.009234250523149967, loss_emo_cau: 0.03693963587284088, loss: 0.046173885464668274
+epoch: 5, step: 300, loss_emo: 0.05131588503718376, loss_emo_cau: 0.09846949577331543, loss: 0.1497853845357895
+epoch: 5, step: 400, loss_emo: 0.016748422756791115, loss_emo_cau: 0.08184825628995895, loss: 0.09859667718410492
+epoch: 5, step: 500, loss_emo: 0.05617714673280716, loss_emo_cau: 0.2737646698951721, loss: 0.3299418091773987
+epoch: 5, step: 600, loss_emo: 0.008197043091058731, loss_emo_cau: 0.15094399452209473, loss: 0.15914103388786316
+epoch: 5, step: 700, loss_emo: 0.012783896178007126, loss_emo_cau: 0.036585334688425064, loss: 0.04936923086643219
+epoch: 5, step: 800, loss_emo: 0.007490749005228281, loss_emo_cau: 0.03481343016028404, loss: 0.042304180562496185
+epoch: 6, step: 0, loss_emo: 0.1501511186361313, loss_emo_cau: 0.05039529874920845, loss: 0.20054641366004944
+epoch: 6, step: 100, loss_emo: 0.1537519246339798, loss_emo_cau: 0.0987112894654274, loss: 0.2524632215499878
+epoch: 6, step: 200, loss_emo: 0.010777132585644722, loss_emo_cau: 0.10628566145896912, loss: 0.11706279218196869
+epoch: 6, step: 300, loss_emo: 0.017774898558855057, loss_emo_cau: 0.04718010127544403, loss: 0.06495499610900879
+epoch: 6, step: 400, loss_emo: 0.2077137678861618, loss_emo_cau: 0.14716947078704834, loss: 0.35488325357437134
+epoch: 6, step: 500, loss_emo: 0.033541783690452576, loss_emo_cau: 0.03291689604520798, loss: 0.06645867973566055
+epoch: 6, step: 600, loss_emo: 0.009826485067605972, loss_emo_cau: 0.012950988486409187, loss: 0.02277747355401516
+epoch: 6, step: 700, loss_emo: 0.006437559146434069, loss_emo_cau: 0.022732727229595184, loss: 0.029170285910367966
+epoch: 6, step: 800, loss_emo: 0.00641592824831605, loss_emo_cau: 0.020523712038993835, loss: 0.026939639821648598
+epoch: 7, step: 0, loss_emo: 0.007238543126732111, loss_emo_cau: 0.018408698961138725, loss: 0.02564724162220955
+epoch: 7, step: 100, loss_emo: 0.005776088684797287, loss_emo_cau: 0.0097407978028059, loss: 0.015516886487603188
+epoch: 7, step: 200, loss_emo: 0.01009326335042715, loss_emo_cau: 0.02446594275534153, loss: 0.034559205174446106
+epoch: 7, step: 300, loss_emo: 0.004974375944584608, loss_emo_cau: 0.017865566536784172, loss: 0.022839942947030067
+epoch: 7, step: 400, loss_emo: 0.09965208917856216, loss_emo_cau: 0.09567929059267044, loss: 0.1953313797712326
+epoch: 7, step: 500, loss_emo: 0.004453322850167751, loss_emo_cau: 0.10147450119256973, loss: 0.10592782497406006
+epoch: 7, step: 600, loss_emo: 0.0608033649623394, loss_emo_cau: 0.16229744255542755, loss: 0.22310081124305725
+epoch: 7, step: 700, loss_emo: 0.014840017072856426, loss_emo_cau: 0.07110241800546646, loss: 0.08594243228435516
+epoch: 7, step: 800, loss_emo: 0.028287868946790695, loss_emo_cau: 0.10357772558927536, loss: 0.13186559081077576
+epoch: 8, step: 0, loss_emo: 0.004037420731037855, loss_emo_cau: 0.15753623843193054, loss: 0.16157366335391998
+epoch: 8, step: 100, loss_emo: 0.29307425022125244, loss_emo_cau: 0.07302558422088623, loss: 0.36609983444213867
+epoch: 8, step: 200, loss_emo: 0.15714937448501587, loss_emo_cau: 0.13454605638980865, loss: 0.29169541597366333
+epoch: 8, step: 300, loss_emo: 0.01039789617061615, loss_emo_cau: 0.04713179171085358, loss: 0.05752968788146973
+epoch: 8, step: 400, loss_emo: 0.020403966307640076, loss_emo_cau: 0.031954213976860046, loss: 0.05235818028450012
+epoch: 8, step: 500, loss_emo: 0.06436730176210403, loss_emo_cau: 0.03557464852929115, loss: 0.09994195401668549
+epoch: 8, step: 600, loss_emo: 0.03286917507648468, loss_emo_cau: 0.01619589887559414, loss: 0.04906507581472397
+epoch: 8, step: 700, loss_emo: 0.007524582091718912, loss_emo_cau: 0.01965363882482052, loss: 0.027178220450878143
+epoch: 8, step: 800, loss_emo: 0.00724056176841259, loss_emo_cau: 0.0879429429769516, loss: 0.09518350660800934
+epoch: 9, step: 0, loss_emo: 0.0023962371051311493, loss_emo_cau: 0.054663218557834625, loss: 0.057059455662965775
+epoch: 9, step: 100, loss_emo: 0.006357243750244379, loss_emo_cau: 0.008024211041629314, loss: 0.01438145525753498
+epoch: 9, step: 200, loss_emo: 0.0015643759397789836, loss_emo_cau: 0.020089123398065567, loss: 0.021653499454259872
+epoch: 9, step: 300, loss_emo: 0.15033990144729614, loss_emo_cau: 0.13737602531909943, loss: 0.2877159118652344
+epoch: 9, step: 400, loss_emo: 0.31181925535202026, loss_emo_cau: 0.31155040860176086, loss: 0.6233696937561035
+epoch: 9, step: 500, loss_emo: 0.002874399535357952, loss_emo_cau: 0.010145324282348156, loss: 0.013019723817706108
+epoch: 9, step: 600, loss_emo: 0.049781255424022675, loss_emo_cau: 0.019099945202469826, loss: 0.06888119876384735
+epoch: 9, step: 700, loss_emo: 0.002937301527708769, loss_emo_cau: 0.15910221636295319, loss: 0.16203951835632324
+epoch: 9, step: 800, loss_emo: 0.0019469589460641146, loss_emo_cau: 0.022979088127613068, loss: 0.024926047772169113
+epoch: 10, step: 0, loss_emo: 0.002078686375170946, loss_emo_cau: 0.00753828464075923, loss: 0.009616971015930176
+epoch: 10, step: 100, loss_emo: 0.005143068730831146, loss_emo_cau: 0.01886049099266529, loss: 0.024003559723496437
+epoch: 10, step: 200, loss_emo: 0.00764786871150136, loss_emo_cau: 0.013972719199955463, loss: 0.02162058837711811
+epoch: 10, step: 300, loss_emo: 0.11500336974859238, loss_emo_cau: 0.019532565027475357, loss: 0.13453593850135803
+epoch: 10, step: 400, loss_emo: 0.004738304764032364, loss_emo_cau: 0.05931270495057106, loss: 0.06405100971460342
+epoch: 10, step: 500, loss_emo: 0.004011654295027256, loss_emo_cau: 0.005758064333349466, loss: 0.00976971909403801
+epoch: 10, step: 600, loss_emo: 0.2703202962875366, loss_emo_cau: 0.008340260945260525, loss: 0.2786605656147003
+epoch: 10, step: 700, loss_emo: 0.0024007793981581926, loss_emo_cau: 0.009234745986759663, loss: 0.011635525152087212
+epoch: 10, step: 800, loss_emo: 0.002955907955765724, loss_emo_cau: 0.008425108157098293, loss: 0.011381016112864017
+epoch: 11, step: 0, loss_emo: 0.005023384932428598, loss_emo_cau: 0.05132119730114937, loss: 0.05634458363056183
+epoch: 11, step: 100, loss_emo: 0.004992375150322914, loss_emo_cau: 0.009141240268945694, loss: 0.014133615419268608
+epoch: 11, step: 200, loss_emo: 0.0020003977697342634, loss_emo_cau: 0.009126776829361916, loss: 0.011127174831926823
+epoch: 11, step: 300, loss_emo: 0.0010296945692971349, loss_emo_cau: 0.012965450994670391, loss: 0.013995145447552204
+epoch: 11, step: 400, loss_emo: 0.0014145326567813754, loss_emo_cau: 0.018415231257677078, loss: 0.0198297630995512
+epoch: 11, step: 500, loss_emo: 0.02657284401357174, loss_emo_cau: 0.05777566507458687, loss: 0.08434850722551346
+epoch: 11, step: 600, loss_emo: 0.0023114255163818598, loss_emo_cau: 0.018697088584303856, loss: 0.021008513867855072
+epoch: 11, step: 700, loss_emo: 0.009542202576994896, loss_emo_cau: 0.0055055697448551655, loss: 0.015047771856188774
+epoch: 11, step: 800, loss_emo: 0.0020052276086062193, loss_emo_cau: 0.015163201838731766, loss: 0.017168428748846054
+epoch: 12, step: 0, loss_emo: 0.003281406359747052, loss_emo_cau: 0.0239094365388155, loss: 0.02719084359705448
+epoch: 12, step: 100, loss_emo: 0.001979730324819684, loss_emo_cau: 0.015970485284924507, loss: 0.017950216308236122
+epoch: 12, step: 200, loss_emo: 0.0032237828709185123, loss_emo_cau: 0.004853107500821352, loss: 0.008076890371739864
+epoch: 12, step: 300, loss_emo: 0.019711824133992195, loss_emo_cau: 0.16662245988845825, loss: 0.1863342821598053
+epoch: 12, step: 400, loss_emo: 0.0064078085124492645, loss_emo_cau: 0.003964534495025873, loss: 0.01037234254181385
+epoch: 12, step: 500, loss_emo: 0.014469913206994534, loss_emo_cau: 0.05113599821925163, loss: 0.06560590863227844
+epoch: 12, step: 600, loss_emo: 0.0015188626712188125, loss_emo_cau: 0.0055206939578056335, loss: 0.007039556745439768
+epoch: 12, step: 700, loss_emo: 0.0031000401359051466, loss_emo_cau: 0.011505648493766785, loss: 0.014605688862502575
+epoch: 12, step: 800, loss_emo: 0.0034854994155466557, loss_emo_cau: 0.006792978383600712, loss: 0.010278478264808655
+epoch: 13, step: 0, loss_emo: 0.0025392412208020687, loss_emo_cau: 0.0037327625323086977, loss: 0.00627200398594141
+epoch: 13, step: 100, loss_emo: 0.002239962574094534, loss_emo_cau: 0.031278129667043686, loss: 0.03351809084415436
+epoch: 13, step: 200, loss_emo: 0.0027306999545544386, loss_emo_cau: 0.006591330748051405, loss: 0.0093220304697752
+epoch: 13, step: 300, loss_emo: 0.0056295148096978664, loss_emo_cau: 0.004126973450183868, loss: 0.009756488725543022
+epoch: 13, step: 400, loss_emo: 0.0035018452908843756, loss_emo_cau: 0.005425130017101765, loss: 0.008926975540816784
+epoch: 13, step: 500, loss_emo: 0.0012156246230006218, loss_emo_cau: 0.006274139508605003, loss: 0.007489764131605625
+epoch: 13, step: 600, loss_emo: 0.0037783202715218067, loss_emo_cau: 0.05165616795420647, loss: 0.055434487760066986
+epoch: 13, step: 700, loss_emo: 0.0016839096788316965, loss_emo_cau: 0.0026035055052489042, loss: 0.004287415184080601
+epoch: 13, step: 800, loss_emo: 0.002254297723993659, loss_emo_cau: 0.003103250404819846, loss: 0.005357548128813505
+epoch: 14, step: 0, loss_emo: 0.002338273450732231, loss_emo_cau: 0.0042495327070355415, loss: 0.006587806157767773
+epoch: 14, step: 100, loss_emo: 0.001604315941222012, loss_emo_cau: 0.02861035242676735, loss: 0.030214669182896614
+epoch: 14, step: 200, loss_emo: 0.01077303010970354, loss_emo_cau: 0.01051849965006113, loss: 0.02129152975976467
+epoch: 14, step: 300, loss_emo: 0.0011190245859324932, loss_emo_cau: 0.005384520627558231, loss: 0.0065035452134907246
+epoch: 14, step: 400, loss_emo: 0.0028673820197582245, loss_emo_cau: 0.005070493556559086, loss: 0.00793787557631731
+epoch: 14, step: 500, loss_emo: 0.0024936061818152666, loss_emo_cau: 0.007580382749438286, loss: 0.010073988698422909
+epoch: 14, step: 600, loss_emo: 0.0011259472230449319, loss_emo_cau: 0.12015942484140396, loss: 0.12128537148237228
+epoch: 14, step: 700, loss_emo: 0.005487451795488596, loss_emo_cau: 0.008216633461415768, loss: 0.013704085722565651
+epoch: 14, step: 800, loss_emo: 0.00630979286506772, loss_emo_cau: 0.004715513437986374, loss: 0.011025305837392807
+epoch: 15, step: 0, loss_emo: 0.004231082741171122, loss_emo_cau: 0.0028131359722465277, loss: 0.007044218480587006
+epoch: 15, step: 100, loss_emo: 0.0006095533608458936, loss_emo_cau: 0.003125755349174142, loss: 0.0037353087682276964
+epoch: 15, step: 200, loss_emo: 0.030864357948303223, loss_emo_cau: 0.11021221429109573, loss: 0.14107656478881836
+epoch: 15, step: 300, loss_emo: 0.002809863770380616, loss_emo_cau: 0.002636874560266733, loss: 0.005446738563477993
+epoch: 15, step: 400, loss_emo: 0.0015628503169864416, loss_emo_cau: 0.01388764288276434, loss: 0.015450493432581425
+epoch: 15, step: 500, loss_emo: 0.0017855196492746472, loss_emo_cau: 0.0018860697746276855, loss: 0.003671589307487011
+epoch: 15, step: 600, loss_emo: 0.0008228789665736258, loss_emo_cau: 0.001400921493768692, loss: 0.002223800402134657
+epoch: 15, step: 700, loss_emo: 0.0011728715617209673, loss_emo_cau: 0.0874326303601265, loss: 0.08860550075769424
+epoch: 15, step: 800, loss_emo: 0.0018480889266356826, loss_emo_cau: 0.006929428316652775, loss: 0.008777516894042492
+epoch: 16, step: 0, loss_emo: 0.001388348056934774, loss_emo_cau: 0.012033548206090927, loss: 0.013421895913779736
+epoch: 16, step: 100, loss_emo: 0.0287765059620142, loss_emo_cau: 0.04832122102379799, loss: 0.07709772884845734
+epoch: 16, step: 200, loss_emo: 0.01079674530774355, loss_emo_cau: 0.006032462697476149, loss: 0.01682920753955841
+epoch: 16, step: 300, loss_emo: 0.0033579845912754536, loss_emo_cau: 0.03188725560903549, loss: 0.03524523973464966
+epoch: 16, step: 400, loss_emo: 0.19910581409931183, loss_emo_cau: 0.12959754467010498, loss: 0.3287033438682556
+epoch: 16, step: 500, loss_emo: 0.0008885384886525571, loss_emo_cau: 0.0028473136480897665, loss: 0.0037358521949499846
+epoch: 16, step: 600, loss_emo: 0.03233056515455246, loss_emo_cau: 0.0062170508317649364, loss: 0.038547616451978683
+epoch: 16, step: 700, loss_emo: 0.002308261813595891, loss_emo_cau: 0.06806306540966034, loss: 0.07037132978439331
+epoch: 16, step: 800, loss_emo: 0.0005115747335366905, loss_emo_cau: 0.004331542644649744, loss: 0.004843117203563452
+epoch: 17, step: 0, loss_emo: 0.0013308576308190823, loss_emo_cau: 0.016970135271549225, loss: 0.018300993368029594
+epoch: 17, step: 100, loss_emo: 0.001662715571001172, loss_emo_cau: 0.004927386064082384, loss: 0.0065901018679142
+epoch: 17, step: 200, loss_emo: 0.0011500873370096087, loss_emo_cau: 0.00462167477235198, loss: 0.005771762225776911
+epoch: 17, step: 300, loss_emo: 0.001272979541681707, loss_emo_cau: 0.0017565563321113586, loss: 0.0030295359902083874
+epoch: 17, step: 400, loss_emo: 0.0009498065337538719, loss_emo_cau: 0.0012579368194565177, loss: 0.0022077434696257114
+epoch: 17, step: 500, loss_emo: 0.0014760735211893916, loss_emo_cau: 0.0017441860400140285, loss: 0.003220259677618742
+epoch: 17, step: 600, loss_emo: 0.0013540135696530342, loss_emo_cau: 0.013584508560597897, loss: 0.01493852213025093
+epoch: 17, step: 700, loss_emo: 0.005075241904705763, loss_emo_cau: 0.010777406394481659, loss: 0.01585264876484871
+epoch: 17, step: 800, loss_emo: 0.002149454550817609, loss_emo_cau: 0.006810210645198822, loss: 0.008959664963185787
+epoch: 18, step: 0, loss_emo: 0.0008031998877413571, loss_emo_cau: 0.003099630819633603, loss: 0.0039028306491672993
+epoch: 18, step: 100, loss_emo: 0.0013597181532531977, loss_emo_cau: 0.0021189323160797358, loss: 0.0034786504693329334
+epoch: 18, step: 200, loss_emo: 0.0007017769385129213, loss_emo_cau: 0.0038076387718319893, loss: 0.004509415477514267
+epoch: 18, step: 300, loss_emo: 0.0006500222953036427, loss_emo_cau: 0.00416909996420145, loss: 0.004819122143089771
+epoch: 18, step: 400, loss_emo: 0.0015368035528808832, loss_emo_cau: 0.012072699144482613, loss: 0.013609502464532852
+epoch: 18, step: 500, loss_emo: 0.0012119304155930877, loss_emo_cau: 0.004164376296103001, loss: 0.00537630682811141
+epoch: 18, step: 600, loss_emo: 0.03527700901031494, loss_emo_cau: 0.040742333978414536, loss: 0.07601934671401978
+epoch: 18, step: 700, loss_emo: 0.0005399500369094312, loss_emo_cau: 0.002581795211881399, loss: 0.0031217453069984913
+epoch: 18, step: 800, loss_emo: 0.0006868030759505928, loss_emo_cau: 0.005575750954449177, loss: 0.006262553855776787
+epoch: 19, step: 0, loss_emo: 0.0007252514478750527, loss_emo_cau: 0.0016060431953519583, loss: 0.00233129458501935
+epoch: 19, step: 100, loss_emo: 0.0007202816777862608, loss_emo_cau: 0.002771451137959957, loss: 0.003491732757538557
+epoch: 19, step: 200, loss_emo: 0.16295696794986725, loss_emo_cau: 0.07219076156616211, loss: 0.23514772951602936
+epoch: 19, step: 300, loss_emo: 0.0013570350129157305, loss_emo_cau: 0.002748481696471572, loss: 0.004105516709387302
+epoch: 19, step: 400, loss_emo: 0.10550691932439804, loss_emo_cau: 0.009783943183720112, loss: 0.11529086530208588
+epoch: 19, step: 500, loss_emo: 0.015028450638055801, loss_emo_cau: 0.006096892524510622, loss: 0.021125342696905136
+epoch: 19, step: 600, loss_emo: 0.002582721645012498, loss_emo_cau: 0.058388885110616684, loss: 0.06097160652279854
+epoch: 19, step: 700, loss_emo: 0.0010865889489650726, loss_emo_cau: 0.004603847861289978, loss: 0.005690436810255051
+epoch: 19, step: 800, loss_emo: 0.0004322604218032211, loss_emo_cau: 0.008448516950011253, loss: 0.008880777284502983
+epoch: 20, step: 0, loss_emo: 0.0005752209690399468, loss_emo_cau: 0.0014365968527272344, loss: 0.002011817879974842
+epoch: 20, step: 100, loss_emo: 0.0005976403481326997, loss_emo_cau: 0.002888268791139126, loss: 0.0034859091974794865
+epoch: 20, step: 200, loss_emo: 0.0006698188371956348, loss_emo_cau: 0.0016896448796615005, loss: 0.002359463833272457
+epoch: 20, step: 300, loss_emo: 0.0003772950731217861, loss_emo_cau: 0.0016843362245708704, loss: 0.0020616312976926565
+epoch: 20, step: 400, loss_emo: 0.0007260290440171957, loss_emo_cau: 0.0004971807356923819, loss: 0.0012232097797095776
+epoch: 20, step: 500, loss_emo: 0.0002532014041207731, loss_emo_cau: 0.00275598862208426, loss: 0.003009190084412694
+epoch: 20, step: 600, loss_emo: 0.004812185186892748, loss_emo_cau: 0.004575047176331282, loss: 0.00938723236322403
+epoch: 20, step: 700, loss_emo: 0.001297702663578093, loss_emo_cau: 0.0016997477505356073, loss: 0.002997450530529022
+epoch: 20, step: 800, loss_emo: 0.0003784456930588931, loss_emo_cau: 0.0016718279803171754, loss: 0.002050273586064577
+epoch: 21, step: 0, loss_emo: 0.0009781052358448505, loss_emo_cau: 0.0025988491252064705, loss: 0.003576954361051321
+epoch: 21, step: 100, loss_emo: 0.0015649395063519478, loss_emo_cau: 0.004923371598124504, loss: 0.006488311104476452
+epoch: 21, step: 200, loss_emo: 0.0014046147698536515, loss_emo_cau: 0.002680267905816436, loss: 0.004084882792085409
+epoch: 21, step: 300, loss_emo: 0.0008995790267363191, loss_emo_cau: 0.002309361705556512, loss: 0.0032089408487081528
+epoch: 21, step: 400, loss_emo: 0.0007299641147255898, loss_emo_cau: 0.07160669565200806, loss: 0.07233665883541107
+epoch: 21, step: 500, loss_emo: 0.0006876461557112634, loss_emo_cau: 0.003632740583270788, loss: 0.0043203867971897125
+epoch: 21, step: 600, loss_emo: 0.0005306514212861657, loss_emo_cau: 0.0016176225617527962, loss: 0.00214827386662364
+epoch: 21, step: 700, loss_emo: 0.0010352188255637884, loss_emo_cau: 0.0018259092466905713, loss: 0.0028611281886696815
+epoch: 21, step: 800, loss_emo: 0.0012291467282921076, loss_emo_cau: 0.0007875837036408484, loss: 0.002016730373725295
+epoch: 22, step: 0, loss_emo: 0.000645577791146934, loss_emo_cau: 0.0017511892365291715, loss: 0.0023967670276761055
+epoch: 22, step: 100, loss_emo: 0.0006222167867235839, loss_emo_cau: 0.0007085667457431555, loss: 0.0013307835906744003
+epoch: 22, step: 200, loss_emo: 0.0005597926210612059, loss_emo_cau: 0.0018323389813303947, loss: 0.0023921316023916006
+epoch: 22, step: 300, loss_emo: 0.0007833112613297999, loss_emo_cau: 0.0012464140309020877, loss: 0.0020297253504395485
+epoch: 22, step: 400, loss_emo: 0.000527295982465148, loss_emo_cau: 0.0025063157081604004, loss: 0.0030336116906255484
+epoch: 22, step: 500, loss_emo: 0.00043533105053938925, loss_emo_cau: 0.0034513259306550026, loss: 0.0038866570685058832
+epoch: 22, step: 600, loss_emo: 0.0013008581008762121, loss_emo_cau: 0.003448749426752329, loss: 0.004749607294797897
+epoch: 22, step: 700, loss_emo: 0.0008643250912427902, loss_emo_cau: 0.009135705418884754, loss: 0.010000030510127544
+epoch: 22, step: 800, loss_emo: 0.0008940736879594624, loss_emo_cau: 0.054990071803331375, loss: 0.05588414520025253
+epoch: 23, step: 0, loss_emo: 0.016568543389439583, loss_emo_cau: 0.01592910662293434, loss: 0.032497651875019073
+epoch: 23, step: 100, loss_emo: 0.0007315046386793256, loss_emo_cau: 0.0013869808753952384, loss: 0.002118485514074564
+epoch: 23, step: 200, loss_emo: 0.0006563147180713713, loss_emo_cau: 0.001477468991652131, loss: 0.0021337836515158415
+epoch: 23, step: 300, loss_emo: 0.0007054957095533609, loss_emo_cau: 0.009336676448583603, loss: 0.01004217192530632
+epoch: 23, step: 400, loss_emo: 0.000534297723788768, loss_emo_cau: 0.0042440746910870075, loss: 0.004778372589498758
+epoch: 23, step: 500, loss_emo: 0.00042388797737658024, loss_emo_cau: 0.0012420499697327614, loss: 0.0016659379471093416
+epoch: 23, step: 600, loss_emo: 0.0011105898302048445, loss_emo_cau: 0.0026145558804273605, loss: 0.003725145710632205
+epoch: 23, step: 700, loss_emo: 0.0006001465953886509, loss_emo_cau: 0.03414100036025047, loss: 0.034741148352622986
+epoch: 23, step: 800, loss_emo: 0.0016699499683454633, loss_emo_cau: 0.0013075520982965827, loss: 0.002977502066642046
+epoch: 24, step: 0, loss_emo: 0.000374862109310925, loss_emo_cau: 0.0019853778649121523, loss: 0.002360240090638399
+epoch: 24, step: 100, loss_emo: 0.0004708728229161352, loss_emo_cau: 0.0023425533436238766, loss: 0.0028134260792285204
+epoch: 24, step: 200, loss_emo: 0.0006187519757077098, loss_emo_cau: 0.00039593072142452, loss: 0.0010146826971322298
+epoch: 24, step: 300, loss_emo: 0.0004125860577914864, loss_emo_cau: 0.03412078693509102, loss: 0.03453337401151657
+epoch: 24, step: 400, loss_emo: 0.0006853224476799369, loss_emo_cau: 0.006624570116400719, loss: 0.007309892680495977
+epoch: 24, step: 500, loss_emo: 0.0008676614379510283, loss_emo_cau: 0.011023730039596558, loss: 0.01189139112830162
+epoch: 24, step: 600, loss_emo: 0.08696728199720383, loss_emo_cau: 0.04607105255126953, loss: 0.13303834199905396
+epoch: 24, step: 700, loss_emo: 0.00025877030566334724, loss_emo_cau: 0.0030332389287650585, loss: 0.0032920092344284058
+epoch: 24, step: 800, loss_emo: 0.0005176150007173419, loss_emo_cau: 0.06652874499559402, loss: 0.06704635918140411
+max_result_emo: [0.8637527121023735, 0.9385474807902375, 0.7999999961904762], max_result_cau: [0.703241393399648, 0.7460317420844882, 0.6650943364854041], max_result_pair: [0.6881183097003909, 0.723958329562717, 0.655660374265753]
+
